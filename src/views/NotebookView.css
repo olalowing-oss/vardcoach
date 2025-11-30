@@ -1,0 +1,73 @@
+.notebook-view {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.page-subtitle {
+  color: var(--color-gray-500);
+  margin-top: -var(--space-sm);
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.notes-day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.notes-day-header span {
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+}
+
+.notes-day-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.note-entry {
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  background: var(--bg-subtle);
+}
+
+.note-entry h4 {
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.note-entry p {
+  margin: 0 0 var(--space-sm) 0;
+  color: var(--color-gray-700);
+  line-height: 1.6;
+}
+
+.note-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+.note-actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.note-actions button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: var(--font-size-base);
+}

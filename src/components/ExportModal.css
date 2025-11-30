@@ -1,0 +1,96 @@
+.export-intro {
+  margin-bottom: var(--space-lg);
+}
+
+.export-intro p {
+  color: var(--color-gray-600);
+  margin: 0;
+}
+
+.export-empty {
+  text-align: center;
+  padding: var(--space-xl);
+}
+
+.export-empty .empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.export-empty p {
+  color: var(--color-gray-500);
+  margin: 0;
+}
+
+.export-empty p:first-of-type {
+  margin-bottom: var(--space-sm);
+}
+
+/* Export options */
+.export-options {
+  margin-bottom: var(--space-lg);
+}
+
+.export-options h3 {
+  font-size: var(--font-size-base);
+  margin-bottom: var(--space-md);
+}
+
+.export-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.export-option:hover {
+  background: var(--color-gray-100);
+}
+
+.option-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 1;
+}
+
+.option-icon {
+  font-size: 1.5rem;
+}
+
+.option-label {
+  display: block;
+  font-weight: var(--font-semibold);
+  color: var(--color-gray-800);
+}
+
+.option-count {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+/* Error message */
+.export-error {
+  background: #ffebee;
+  color: var(--color-danger);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+/* Actions */
+.export-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-gray-200);
+}

@@ -1,0 +1,66 @@
+import React from 'react';
+import { useApp } from '../../../context/AppContext';
+import { useReminders } from '../../../hooks/useReminders';
+import './Sidebar.css';
+
+const NAV_ITEMS = [
+  { id: 'dashboard', icon: '🏠', label: 'Hem' },
+  { id: 'analysis', icon: '🩺', label: 'Övergripande analys' },
+  { id: 'calendar', icon: '📅', label: 'Kalender' },
+  { id: 'diagnoses', icon: '🔬', label: 'Diagnoser' },
+  { id: 'medications', icon: '💊', label: 'Läkemedel' },
+  { id: 'diary', icon: '📔', label: 'Hälsodagbok' },
+  { id: 'notebook', icon: '📒', label: 'Anteckningsbok' },
+  { id: 'reminders', icon: '🔔', label: 'Påminnelser' },
+  { id: 'questions', icon: '❓', label: 'Frågor till läkaren' },
+];
+
+export function Sidebar() {
+  const { state, actions } = useApp();
+  const { activeView } = state;
+  const { getActiveRemindersCount } = useReminders();
+
+  const reminderCount = getActiveRemindersCount();
+
+  return (
+    <aside className="sidebar">
+      {/* Logo */}
+      <div className="sidebar-header">
+        <div className="sidebar-logo">
+          <span className="sidebar-logo-icon">🏥</span>
+          <span className="sidebar-logo-text">Vårdcoachen</span>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="sidebar-nav">
+        {NAV_ITEMS.map((item) => (
+          <button
+            key={item.id}
+            className={`sidebar-nav-item ${activeView === item.id ? 'active' : ''}`}
+            onClick={() => actions.setView(item.id)}
+          >
+            <span className="sidebar-nav-icon">{item.icon}</span>
+            <span className="sidebar-nav-label">{item.label}</span>
+            {item.id === 'reminders' && reminderCount > 0 && (
+              <span className="sidebar-badge">{reminderCount}</span>
+            )}
+          </button>
+        ))}
+      </nav>
+
+      {/* Export button */}
+      <div className="sidebar-footer">
+        <button 
+          className="sidebar-export-btn"
+          onClick={actions.toggleExportModal}
+        >
+          <span>📄</span>
+          <span>Exportera PDF</span>
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+export default Sidebar;

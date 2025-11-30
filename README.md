@@ -1,70 +1,208 @@
-# Getting Started with Create React App
+# Vårdcoachen v4 - Mobilanpassad hälsoapp
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+En komplett React-app för att hantera din hälsa med stöd för mobil och desktop.
 
-## Available Scripts
+## 🚀 Funktioner
 
-In the project directory, you can run:
+### Huvudfunktioner
+- **Hem** - Översikt över din hälsa
+- **Anteckningsbok** - Fri anteckningsyta för tankar och observationer
+- **Övergripande analys** - AI som analyserar alla diagnoser + läkemedel
+- **Kalender** - Månadsvy och besökshantering
+- **Diagnoser** - Registrering med AI-analys
+- **Läkemedel** - Dosering och dagligt intag
+- **Hälsodagbok** - Humör och symtom
+- **Påminnelser** - Webbnotifikationer
+- **Frågor** - AI-genererade frågor till läkaren
+- **PDF-export** - Sammanfattning att ta med till läkarbesök
 
-### `npm start`
+### Mobilanpassning
+- 📱 **Bottom navigation** - Enkel navigering på mobil
+- 👆 **Touch-vänligt** - Stora klickytor (44px+)
+- 🔄 **Responsiv design** - Anpassar sig till skärmstorleken
+- 💾 **PWA-stöd** - Kan installeras som app
+- 🔔 **Push-notiser** - Påminnelser via webbläsaren
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 📁 Projektstruktur
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```
+vårdcoachen/
+├── public/
+│   ├── index.html
+│   └── manifest.json
+├── src/
+│   ├── components/
+│   │   ├── common/           # Återanvändbara komponenter
+│   │   │   ├── Navigation/   # Sidebar, BottomNav, Header
+│   │   │   ├── Button.jsx
+│   │   │   ├── Card.jsx
+│   │   │   ├── Modal.jsx
+│   │   │   └── Input.jsx
+│   │   ├── ExportModal.jsx
+│   │   └── Notifications.jsx
+│   ├── context/
+│   │   └── AppContext.jsx    # Global state management
+│   ├── hooks/
+│   │   ├── useReminders.js   # Besökspåminnelser
+│   │   └── useAI.js          # AI-integration
+│   ├── services/
+│   │   └── supabaseClient.js # Supabase-klient
+│   ├── utils/
+│   │   ├── helpers.js        # Hjälpfunktioner
+│   │   └── pdfExport.js      # PDF-generering
+│   ├── views/
+│   │   ├── Dashboard.jsx
+│   │   ├── CalendarView.jsx
+│   │   ├── MedicationsView.jsx
+│   │   ├── DiagnosesView.jsx
+│   │   ├── NotebookView.jsx
+│   │   ├── OverallAnalysisView.jsx
+│   │   ├── DiaryView.jsx
+│   │   ├── RemindersView.jsx
+│   │   └── QuestionsView.jsx
+│   ├── styles/
+│   │   ├── variables.css     # CSS-variabler
+│   │   └── index.css         # Globala stilar
+│   ├── App.jsx
+│   ├── App.css
+│   └── index.js
+└── package.json
+```
 
-### `npm test`
+## 🛠️ Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Alternativ 1: Från scratch med Create React App
 
-### `npm run build`
+```bash
+# Skapa nytt projekt
+npx create-react-app vårdcoachen
+cd vårdcoachen
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# Ta bort standardfiler
+rm -rf src/*
+rm -rf public/*
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# Kopiera alla filer från detta projekt till src/ och public/
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# Installera och starta
+npm install
+npm start
+```
 
-### `npm run eject`
+### Alternativ 2: Kopiera till befintligt projekt
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. Kopiera hela `src/` mappen till ditt projekt
+2. Kopiera `public/` filerna
+3. Kör `npm install` och `npm start`
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 📱 Responsiva breakpoints
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+| Breakpoint | Storlek | Layout |
+|------------|---------|--------|
+| Mobile | < 640px | Bottom nav, enkel kolumn |
+| Tablet | 640-1024px | Bottom nav, 2 kolumner |
+| Desktop | > 1024px | Sidebar, full layout |
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🎨 Design System
 
-## Learn More
+### Färger
+- **Primary**: `#2E7D5C` (Medicinsk grön)
+- **Secondary**: `#3498db` (Blå)
+- **Accent**: `#9b59b6` (Lila)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Typografi
+- **Font**: Nunito (Google Fonts)
+- **Storlekar**: 0.75rem - 1.875rem
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Spacing
+- XS: 0.25rem
+- SM: 0.5rem
+- MD: 1rem
+- LG: 1.5rem
+- XL: 2rem
 
-### Code Splitting
+## 🔔 Påminnelser
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Appen stöder webbnotifikationer för:
+- **Besök**: Kl 18:00 dagen innan
 
-### Analyzing the Bundle Size
+**Krav:**
+- Webbläsaren måste vara öppen (kan vara i bakgrunden)
+- Användaren måste godkänna notifikationer
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📄 PDF-export
 
-### Making a Progressive Web App
+Genererar PDF med jsPDF (laddas från CDN). Innehåller:
+- Diagnoser
+- Läkemedel (aktiva + avslutade)
+- Vårdbesök (senaste 10)
+- Dagboksanteckningar (senaste 15)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 🤖 AI-funktioner
 
-### Advanced Configuration
+Appen använder OpenAI:s Chat Completions API för:
+- Diagnosanalys och förklaring
+- Generering av frågor till läkaren
+- Analys av dagboksmönster
+- Sparade AI-svar och följdfrågor per diagnos (med möjlighet att radera)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+**OBS:** Du behöver ett eget OpenAI-konto och API-nyckel.
 
-### Deployment
+### Konfiguration
+1. Skapa en fil som heter `.env.local` i projektroten.
+2. Kopiera innehållet från `.env.example` och klistra in i `.env.local`.
+3. Fyll i `REACT_APP_OPENAI_API_KEY` med din OpenAI-nyckel.
+4. Valfritt: ändra `REACT_APP_OPENAI_MODEL` (t.ex. `gpt-4o-mini`).
+5. Starta om `npm start` efter att du lagt till/ändrat nycklar.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+> För produktion rekommenderas att du skapar en enkel backend-proxy så att API-nyckeln inte exponeras i klientkoden.
 
-### `npm run build` fails to minify
+## ☁️ Supabase-synk (valfri)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Vill du spara informationen i molnet istället för endast i localStorage kan du aktivera Supabase:
+
+1. Skapa ett Supabase-projekt och kopiera URL + `anon`-nyckel.
+2. Lägg till variablerna `REACT_APP_SUPABASE_URL` och `REACT_APP_SUPABASE_ANON_KEY` i `.env.local`.
+3. Skapa tabellen `health_profiles` i Supabase (SQL):
+
+```sql
+create table if not exists public.health_profiles (
+  id uuid primary key default gen_random_uuid(),
+  data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+```
+
+> Om du vill använda en annan struktur går det bra – ändra bara tabellnamn/kolumner i `AppContext`.
+
+Appen skapar automatiskt ett anonymt profil-id (`vårdcoachen-profile-id` i localStorage) och synkar allt innehåll till kolumnen `data`. Om Supabase inte är konfigurerat eller om synken misslyckas fortsätter appen använda localStorage som tidigare.
+
+## 💾 Datalagring
+
+All data lagras lokalt i webbläsarens localStorage:
+- `vårdcoachen-diagnoses`
+- `vårdcoachen-medications`
+- `vårdcoachen-diary`
+- `vårdcoachen-appointments`
+- `vårdcoachen-aiNotes`
+- `vårdcoachen-overallAiNotes`
+- `vårdcoachen-medicationLog`
+- `vårdcoachen-notes`
+- `vårdcoachen-profile-id` (endast när Supabase används)
+
+**Begränsningar:**
+- Data synkroniseras INTE mellan enheter
+- Rensas om användaren rensar webbläsardata
+- Ca 5MB lagringsutrymme
+
+> Med Supabase aktiverat kan du nå samma data från flera enheter så länge du använder samma profil-id (hanteras automatiskt av appen).
+
+## ⚠️ Viktig information
+
+**Vårdcoachen ersätter INTE medicinsk rådgivning.**
+
+Kontakta alltid vården vid medicinska frågor. AI-funktionerna ger endast allmän information för att hjälpa dig förbereda dig för vårdbesök.
+
+## 📝 Licens
+
+Privat projekt. All kod är fri att använda för personligt bruk.

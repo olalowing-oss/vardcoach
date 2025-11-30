@@ -1,0 +1,281 @@
+.calendar-view {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.view-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+  .view-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .view-header .page-title {
+    margin-bottom: 0;
+  }
+}
+
+.view-actions {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.view-toggle {
+  display: flex;
+  background: var(--color-gray-100);
+  border-radius: var(--radius-md);
+  padding: 4px;
+}
+
+.toggle-btn {
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.toggle-btn.active {
+  background: white;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Calendar Card */
+.calendar-card {
+  overflow: hidden;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.cal-nav {
+  width: 40px;
+  height: 40px;
+  background: var(--color-gray-100);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1.5rem;
+  color: var(--color-gray-600);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cal-nav:hover {
+  background: var(--color-gray-200);
+}
+
+.cal-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-bold);
+}
+
+/* Calendar Grid */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.weekday {
+  text-align: center;
+  padding: var(--space-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-bold);
+  color: var(--color-gray-500);
+  text-transform: uppercase;
+}
+
+.day {
+  min-height: 60px;
+  padding: var(--space-xs);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+@media (min-width: 640px) {
+  .day {
+    min-height: 80px;
+    padding: var(--space-sm);
+  }
+}
+
+.day:hover {
+  background: var(--color-gray-100);
+}
+
+.day.empty {
+  background: transparent;
+  cursor: default;
+}
+
+.day.today {
+  background: var(--color-primary-pale);
+  border: 2px solid var(--color-primary);
+}
+
+.day.has-events {
+  background: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.day-number {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-gray-700);
+  margin-bottom: 2px;
+}
+
+.day.today .day-number {
+  color: var(--color-primary);
+}
+
+.day-event {
+  font-size: 0.65rem;
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+@media (min-width: 640px) {
+  .day-event {
+    font-size: var(--font-size-xs);
+    padding: 3px 6px;
+  }
+}
+
+.day-more {
+  font-size: 0.6rem;
+  color: var(--color-gray-500);
+  text-align: center;
+}
+
+/* Appointments List */
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.apt-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  cursor: pointer;
+}
+
+.apt-date-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 55px;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.apt-day {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-bold);
+  line-height: 1;
+}
+
+.apt-month {
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  font-weight: var(--font-medium);
+}
+
+.apt-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.apt-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-semibold);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.apt-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+}
+
+.apt-reminder {
+  font-size: 1rem;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: var(--space-2xl);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.empty-state p {
+  color: var(--color-gray-500);
+  margin-bottom: var(--space-lg);
+}
+
+/* Form */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+@media (min-width: 640px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.modal-actions-right {
+  display: flex;
+  gap: var(--space-sm);
+  margin-left: auto;
+}

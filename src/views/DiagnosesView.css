@@ -1,0 +1,338 @@
+.diagnoses-view {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.view-header .page-title {
+  margin-bottom: 0;
+}
+
+/* Diagnoses list */
+.diagnoses-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.diag-card {
+  border-left: 4px solid var(--color-primary);
+}
+
+.diag-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.diag-name {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-gray-900);
+}
+
+.diag-date {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  background: var(--color-gray-100);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+}
+
+.diag-doctor {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  margin-bottom: var(--space-sm);
+}
+
+.diag-description {
+  font-size: var(--font-size-base);
+  color: var(--color-gray-700);
+  margin-bottom: var(--space-sm);
+  line-height: 1.6;
+}
+
+.diag-treatment {
+  background: var(--color-primary-pale);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-primary-dark);
+  margin-bottom: var(--space-md);
+}
+
+.diag-treatment strong {
+  font-weight: var(--font-semibold);
+}
+
+.diag-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.edit-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.edit-btn:hover {
+  color: var(--color-primary);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: var(--space-2xl);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.empty-state p {
+  color: var(--color-gray-500);
+  margin-bottom: var(--space-lg);
+}
+
+/* Form */
+.form-group {
+  margin-bottom: var(--space-md);
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+@media (min-width: 640px) {
+  .form-row-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.modal-actions-right {
+  display: flex;
+  gap: var(--space-sm);
+  margin-left: auto;
+}
+
+/* AI Analysis Modal */
+.ai-analysis {
+  min-height: 200px;
+}
+
+.ai-diagnosis-header {
+  background: var(--color-primary-pale);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+}
+
+.ai-diagnosis-header h3 {
+  color: var(--color-primary-dark);
+  margin: 0;
+}
+
+.ai-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-gray-200);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--space-md);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.ai-loading p {
+  color: var(--color-gray-500);
+}
+
+.ai-content {
+  animation: fadeIn 0.3s ease;
+}
+
+.ai-text {
+  line-height: 1.7;
+  color: var(--color-gray-700);
+}
+
+.ai-text p {
+  margin-bottom: var(--space-md);
+}
+
+.ai-disclaimer {
+  background: #fff3e0;
+  border: 1px solid #ffcc80;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: #e65100;
+  margin-top: var(--space-lg);
+}
+
+.ai-error {
+  color: var(--color-danger);
+  text-align: center;
+  padding: var(--space-lg);
+}
+
+.ai-empty {
+  padding: var(--space-lg);
+  text-align: center;
+  color: var(--color-gray-500);
+  background: #f8faf9;
+  border-radius: var(--radius-md);
+}
+
+.ai-actions {
+  margin-top: var(--space-lg);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ai-followup {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-gray-200);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.ai-history {
+  margin-top: var(--space-xl);
+  border-top: 1px solid var(--color-gray-200);
+  padding-top: var(--space-xl);
+}
+
+.ai-history-header h4 {
+  margin: 0;
+}
+
+.ai-history-header p {
+  margin-top: var(--space-xs);
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+}
+
+.ai-history-empty {
+  margin-top: var(--space-md);
+  color: var(--color-gray-500);
+}
+
+.ai-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.ai-history-item {
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ai-history-item.active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(46, 125, 92, 0.1);
+}
+
+.ai-history-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.ai-history-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.ai-history-question {
+  font-weight: 600;
+  color: var(--color-gray-800);
+}
+
+.ai-history-date {
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+}
+
+.ai-history-delete {
+  border: none;
+  background: none;
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--radius-sm);
+  transition: background 0.2s ease;
+}
+
+.ai-history-delete:hover {
+  background: rgba(220, 53, 69, 0.1);
+}
+
+.ai-history-answer p {
+  margin-bottom: var(--space-sm);
+}
+
+.ai-history-answer p:last-child {
+  margin-bottom: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

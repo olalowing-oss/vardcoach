@@ -1,0 +1,98 @@
+.notifications-container {
+  position: fixed;
+  top: var(--space-md);
+  right: var(--space-md);
+  z-index: var(--z-notification);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-width: calc(100vw - 2rem);
+  width: 350px;
+}
+
+@media (max-width: 640px) {
+  .notifications-container {
+    top: calc(var(--header-height) + var(--space-sm));
+    left: var(--space-md);
+    right: var(--space-md);
+    width: auto;
+  }
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s ease;
+}
+
+.notification-medication {
+  background: var(--color-primary);
+  color: white;
+}
+
+.notification-appointment {
+  background: var(--color-secondary);
+  color: white;
+}
+
+.notification-info {
+  background: var(--color-gray-800);
+  color: white;
+}
+
+.notification-success {
+  background: var(--color-success);
+  color: white;
+}
+
+.notification-warning {
+  background: var(--color-warning);
+  color: white;
+}
+
+.notification-error {
+  background: var(--color-danger);
+  color: white;
+}
+
+.notification-message {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-medium);
+}
+
+.notification-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: white;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition-fast);
+}
+
+.notification-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

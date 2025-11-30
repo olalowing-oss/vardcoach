@@ -1,38 +1,107 @@
-.App {
-  text-align: center;
-}
+/* App-specific styles */
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.app-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-@keyframes App-logo-spin {
+/* Desktop layout with sidebar */
+@media (min-width: 1024px) {
+  .app-container {
+    margin-left: var(--sidebar-width);
+  }
+}
+
+/* Footer */
+.app-footer {
+  display: none;
+  text-align: center;
+  padding: var(--space-md) var(--space-lg);
+  background: white;
+  border-top: 1px solid var(--color-gray-200);
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+}
+
+.app-footer p {
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .app-footer {
+    display: block;
+  }
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  padding: var(--space-md);
+  padding-bottom: calc(var(--nav-height-mobile) + var(--space-lg));
+  background: var(--bg-main);
+  min-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 1024px) {
+  .main-content {
+    padding: var(--space-xl);
+    padding-bottom: var(--space-xl);
+  }
+}
+
+/* Page transitions */
+.main-content > * {
+  animation: pageEnter 0.3s ease;
+}
+
+@keyframes pageEnter {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(10px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* iOS safe areas */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .main-content {
+    padding-bottom: calc(var(--nav-height-mobile) + var(--space-lg) + env(safe-area-inset-bottom));
+  }
+  
+  @media (min-width: 1024px) {
+    .main-content {
+      padding-bottom: var(--space-xl);
+    }
+  }
+}
+
+/* Print styles */
+@media print {
+  .app-footer,
+  .bottom-nav,
+  .sidebar,
+  .header {
+    display: none !important;
+  }
+  
+  .main-content {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .app-container {
+    margin-left: 0;
   }
 }
