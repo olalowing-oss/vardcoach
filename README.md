@@ -1,0 +1,208 @@
+# Vårdcoachen v4 - Mobilanpassad hälsoapp
+
+En komplett React-app för att hantera din hälsa med stöd för mobil och desktop.
+
+## 🚀 Funktioner
+
+### Huvudfunktioner
+- **Hem** - Översikt över din hälsa
+- **Anteckningsbok** - Fri anteckningsyta för tankar och observationer
+- **Övergripande analys** - AI som analyserar alla diagnoser + läkemedel
+- **Kalender** - Månadsvy och besökshantering
+- **Diagnoser** - Registrering med AI-analys
+- **Läkemedel** - Dosering och dagligt intag
+- **Hälsodagbok** - Humör och symtom
+- **Påminnelser** - Webbnotifikationer
+- **Frågor** - AI-genererade frågor till läkaren
+- **PDF-export** - Sammanfattning att ta med till läkarbesök
+
+### Mobilanpassning
+- 📱 **Bottom navigation** - Enkel navigering på mobil
+- 👆 **Touch-vänligt** - Stora klickytor (44px+)
+- 🔄 **Responsiv design** - Anpassar sig till skärmstorleken
+- 💾 **PWA-stöd** - Kan installeras som app
+- 🔔 **Push-notiser** - Påminnelser via webbläsaren
+
+## 📁 Projektstruktur
+
+```
+vårdcoachen/
+├── public/
+│   ├── index.html
+│   └── manifest.json
+├── src/
+│   ├── components/
+│   │   ├── common/           # Återanvändbara komponenter
+│   │   │   ├── Navigation/   # Sidebar, BottomNav, Header
+│   │   │   ├── Button.jsx
+│   │   │   ├── Card.jsx
+│   │   │   ├── Modal.jsx
+│   │   │   └── Input.jsx
+│   │   ├── ExportModal.jsx
+│   │   └── Notifications.jsx
+│   ├── context/
+│   │   └── AppContext.jsx    # Global state management
+│   ├── hooks/
+│   │   ├── useReminders.js   # Besökspåminnelser
+│   │   └── useAI.js          # AI-integration
+│   ├── services/
+│   │   └── supabaseClient.js # Supabase-klient
+│   ├── utils/
+│   │   ├── helpers.js        # Hjälpfunktioner
+│   │   └── pdfExport.js      # PDF-generering
+│   ├── views/
+│   │   ├── Dashboard.jsx
+│   │   ├── CalendarView.jsx
+│   │   ├── MedicationsView.jsx
+│   │   ├── DiagnosesView.jsx
+│   │   ├── NotebookView.jsx
+│   │   ├── OverallAnalysisView.jsx
+│   │   ├── DiaryView.jsx
+│   │   ├── RemindersView.jsx
+│   │   └── QuestionsView.jsx
+│   ├── styles/
+│   │   ├── variables.css     # CSS-variabler
+│   │   └── index.css         # Globala stilar
+│   ├── App.jsx
+│   ├── App.css
+│   └── index.js
+└── package.json
+```
+
+## 🛠️ Installation
+
+### Alternativ 1: Från scratch med Create React App
+
+```bash
+# Skapa nytt projekt
+npx create-react-app vårdcoachen
+cd vårdcoachen
+
+# Ta bort standardfiler
+rm -rf src/*
+rm -rf public/*
+
+# Kopiera alla filer från detta projekt till src/ och public/
+
+# Installera och starta
+npm install
+npm start
+```
+
+### Alternativ 2: Kopiera till befintligt projekt
+
+1. Kopiera hela `src/` mappen till ditt projekt
+2. Kopiera `public/` filerna
+3. Kör `npm install` och `npm start`
+
+## 📱 Responsiva breakpoints
+
+| Breakpoint | Storlek | Layout |
+|------------|---------|--------|
+| Mobile | < 640px | Bottom nav, enkel kolumn |
+| Tablet | 640-1024px | Bottom nav, 2 kolumner |
+| Desktop | > 1024px | Sidebar, full layout |
+
+## 🎨 Design System
+
+### Färger
+- **Primary**: `#2E7D5C` (Medicinsk grön)
+- **Secondary**: `#3498db` (Blå)
+- **Accent**: `#9b59b6` (Lila)
+
+### Typografi
+- **Font**: Nunito (Google Fonts)
+- **Storlekar**: 0.75rem - 1.875rem
+
+### Spacing
+- XS: 0.25rem
+- SM: 0.5rem
+- MD: 1rem
+- LG: 1.5rem
+- XL: 2rem
+
+## 🔔 Påminnelser
+
+Appen stöder webbnotifikationer för:
+- **Besök**: Kl 18:00 dagen innan
+
+**Krav:**
+- Webbläsaren måste vara öppen (kan vara i bakgrunden)
+- Användaren måste godkänna notifikationer
+
+## 📄 PDF-export
+
+Genererar PDF med jsPDF (laddas från CDN). Innehåller:
+- Diagnoser
+- Läkemedel (aktiva + avslutade)
+- Vårdbesök (senaste 10)
+- Dagboksanteckningar (senaste 15)
+
+## 🤖 AI-funktioner
+
+Appen använder OpenAI:s Chat Completions API för:
+- Diagnosanalys och förklaring
+- Generering av frågor till läkaren
+- Analys av dagboksmönster
+- Sparade AI-svar och följdfrågor per diagnos (med möjlighet att radera)
+
+**OBS:** Du behöver ett eget OpenAI-konto och API-nyckel.
+
+### Konfiguration
+1. Skapa en fil som heter `.env.local` i projektroten.
+2. Kopiera innehållet från `.env.example` och klistra in i `.env.local`.
+3. Fyll i `REACT_APP_OPENAI_API_KEY` med din OpenAI-nyckel.
+4. Valfritt: ändra `REACT_APP_OPENAI_MODEL` (t.ex. `gpt-4o-mini`).
+5. Starta om `npm start` efter att du lagt till/ändrat nycklar.
+
+> För produktion rekommenderas att du skapar en enkel backend-proxy så att API-nyckeln inte exponeras i klientkoden.
+
+## ☁️ Supabase-synk (valfri)
+
+Vill du spara informationen i molnet istället för endast i localStorage kan du aktivera Supabase:
+
+1. Skapa ett Supabase-projekt och kopiera URL + `anon`-nyckel.
+2. Lägg till variablerna `REACT_APP_SUPABASE_URL` och `REACT_APP_SUPABASE_ANON_KEY` i `.env.local`.
+3. Skapa tabellen `health_profiles` i Supabase (SQL):
+
+```sql
+create table if not exists public.health_profiles (
+  id uuid primary key default gen_random_uuid(),
+  data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+```
+
+> Om du vill använda en annan struktur går det bra – ändra bara tabellnamn/kolumner i `AppContext`.
+
+Appen skapar automatiskt ett anonymt profil-id (`vårdcoachen-profile-id` i localStorage) och synkar allt innehåll till kolumnen `data`. Om Supabase inte är konfigurerat eller om synken misslyckas fortsätter appen använda localStorage som tidigare.
+
+## 💾 Datalagring
+
+All data lagras lokalt i webbläsarens localStorage:
+- `vårdcoachen-diagnoses`
+- `vårdcoachen-medications`
+- `vårdcoachen-diary`
+- `vårdcoachen-appointments`
+- `vårdcoachen-aiNotes`
+- `vårdcoachen-overallAiNotes`
+- `vårdcoachen-medicationLog`
+- `vårdcoachen-notes`
+- `vårdcoachen-profile-id` (endast när Supabase används)
+
+**Begränsningar:**
+- Data synkroniseras INTE mellan enheter
+- Rensas om användaren rensar webbläsardata
+- Ca 5MB lagringsutrymme
+
+> Med Supabase aktiverat kan du nå samma data från flera enheter så länge du använder samma profil-id (hanteras automatiskt av appen).
+
+## ⚠️ Viktig information
+
+**Vårdcoachen ersätter INTE medicinsk rådgivning.**
+
+Kontakta alltid vården vid medicinska frågor. AI-funktionerna ger endast allmän information för att hjälpa dig förbereda dig för vårdbesök.
+
+## 📝 Licens
+
+Privat projekt. All kod är fri att använda för personligt bruk.
