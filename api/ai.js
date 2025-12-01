@@ -1,10 +1,9 @@
 /* eslint-disable no-console */
-const fetch = global.fetch || ((...args) => import('node-fetch').then(({ default: fetchFn }) => fetchFn(...args)));
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -42,7 +41,8 @@ module.exports = async (req, res) => {
       { role: 'user', content: prompt }
     ];
 
-    const response = await fetch(OPENAI_URL, {
+    const fetchImpl = global.fetch || (await import('node-fetch')).default;
+    const response = await fetchImpl(OPENAI_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -68,4 +68,4 @@ module.exports = async (req, res) => {
     console.error('Proxy error:', error);
     return res.status(500).json({ error: 'Kunde inte kontakta OpenAI.' });
   }
-};
+}
