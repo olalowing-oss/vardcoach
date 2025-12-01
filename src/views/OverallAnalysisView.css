@@ -126,6 +126,28 @@
 .ai-actions {
   margin-top: var(--space-lg);
   display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.ai-actions > div {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.save-dialog {
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  background: #f8faf9;
+}
+
+.save-dialog-actions {
+  margin-top: var(--space-md);
+  display: flex;
+  gap: var(--space-sm);
   justify-content: flex-end;
 }
 
@@ -212,15 +234,32 @@
   font-size: var(--font-size-sm);
 }
 
+.ai-history-actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.ai-history-action,
 .ai-history-delete {
   border: none;
   background: none;
-  color: var(--color-danger);
-  font-size: var(--font-size-sm);
+  font-size: 1.2rem;
   cursor: pointer;
   padding: var(--space-2xs) var(--space-xs);
   border-radius: var(--radius-sm);
   transition: background 0.2s ease;
+}
+
+.ai-history-action {
+  color: var(--color-primary);
+}
+
+.ai-history-action:hover {
+  background: rgba(46, 125, 92, 0.1);
+}
+
+.ai-history-delete {
+  color: var(--color-danger);
 }
 
 .ai-history-delete:hover {
@@ -233,6 +272,12 @@
 
 .ai-history-answer p:last-child {
   margin-bottom: 0;
+}
+
+.ai-history-more {
+  color: var(--color-primary);
+  font-style: italic;
+  font-size: var(--font-size-sm);
 }
 
 @media (max-width: 640px) {
