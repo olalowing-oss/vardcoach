@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../../context/AppContext';
+import { useAuth } from '../../../context/AuthContext';
 import { useReminders } from '../../../hooks/useReminders';
 import './Sidebar.css';
 
@@ -19,9 +20,20 @@ const NAV_ITEMS = [
 export function Sidebar() {
   const { state, actions } = useApp();
   const { activeView } = state;
+  const { user, profile, signOut, isSupabaseEnabled } = useAuth();
   const { getActiveRemindersCount } = useReminders();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const reminderCount = getActiveRemindersCount();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      setShowUserMenu(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   return (
     <aside className="sidebar">
@@ -50,9 +62,44 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Export button */}
+      {/* Footer with user info and export */}
       <div className="sidebar-footer">
-        <button 
+        {isSupabaseEnabled && user && (
+          <div className="sidebar-user">
+            <button
+              className="sidebar-user-btn"
+              onClick={() => setShowUserMenu(!showUserMenu)}
+            >
+              <div className="sidebar-user-avatar">👤</div>
+              <div className="sidebar-user-info">
+                <div className="sidebar-user-name">{profile?.full_name || user.email?.split('@')[0]}</div>
+                <div className="sidebar-user-email">{user.email}</div>
+              </div>
+            </button>
+            {showUserMenu && (
+              <div className="sidebar-user-menu">
+                <button
+                  className="sidebar-user-menu-item"
+                  onClick={() => {
+                    actions.setView('profile');
+                    setShowUserMenu(false);
+                  }}
+                >
+                  <span>⚙️</span>
+                  <span>Inställningar</span>
+                </button>
+                <button
+                  className="sidebar-user-menu-item sidebar-user-logout"
+                  onClick={handleLogout}
+                >
+                  <span>🚪</span>
+                  <span>Logga ut</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+        <button
           className="sidebar-export-btn"
           onClick={actions.toggleExportModal}
         >

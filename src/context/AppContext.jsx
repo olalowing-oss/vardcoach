@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
 import { supabase, isSupabaseEnabled } from '../services/supabaseClient';
+import { useAuth } from './AuthContext';
 
 // Initial State
 const PROFILE_STORAGE_KEY = 'vardcoachen-profile-id';
@@ -369,6 +370,7 @@ const AppContext = createContext(null);
 // Provider Component
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
+  const { user, loading: authLoading } = useAuth();
   const hasHydrated = useRef(false);
   const profileIdRef = useRef(
     typeof window !== 'undefined'
@@ -384,17 +386,31 @@ export function AppProvider({ children }) {
     let hydrationTimer;
 
     const loadData = async () => {
+      // Wait for authentication to finish
+      if (authLoading) {
+        return;
+      }
+
       dispatch({ type: ACTIONS.SET_LOADING, payload: true });
       const localData = loadLocalData();
       let payload = localData;
 
       if (isSupabaseEnabled && supabase) {
         try {
-          let profileId = profileIdRef.current;
-          if (!profileId && typeof window !== 'undefined') {
-            profileId = generateProfileId();
+          let profileId;
+
+          // If user is authenticated, use their user ID
+          if (user) {
+            profileId = user.id;
             profileIdRef.current = profileId;
-            window.localStorage.setItem(PROFILE_STORAGE_KEY, profileId);
+          } else {
+            // Fallback to generated profile ID for local use
+            profileId = profileIdRef.current;
+            if (!profileId && typeof window !== 'undefined') {
+              profileId = generateProfileId();
+              profileIdRef.current = profileId;
+              window.localStorage.setItem(PROFILE_STORAGE_KEY, profileId);
+            }
           }
 
           if (profileId) {
@@ -414,7 +430,11 @@ export function AppProvider({ children }) {
               remoteData = { ...localData };
               const { error: upsertError } = await supabase
                 .from('health_profiles')
-                .upsert({ id: profileId, data: remoteData });
+                .upsert({
+                  id: profileId,
+                  user_id: user?.id || null,
+                  data: remoteData
+                });
               if (upsertError) {
                 throw upsertError;
               }
@@ -451,7 +471,7 @@ export function AppProvider({ children }) {
         clearTimeout(hydrationTimer);
       }
     };
-  }, []);
+  }, [user, authLoading]);
 
   // Save to localStorage when data changes
   useEffect(() => {
@@ -536,7 +556,11 @@ export function AppProvider({ children }) {
       try {
         const { error } = await supabase
           .from('health_profiles')
-          .upsert({ id: profileIdRef.current, data: payload });
+          .upsert({
+            id: profileIdRef.current,
+            user_id: user?.id || null,
+            data: payload
+          });
         if (error) {
           console.error('Supabase sync error:', error);
         }

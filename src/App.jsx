@@ -1,20 +1,23 @@
 import React, { useEffect } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider, useApp } from './context/AppContext';
 import { useReminders } from './hooks/useReminders';
 import { Sidebar, BottomNav, Header } from './components/common';
 import { Notifications } from './components/Notifications';
 import { ExportModal } from './components/ExportModal';
-import { 
-  Dashboard, 
-  CalendarView, 
-  MedicationsView, 
+import { AuthPage } from './components/auth';
+import {
+  Dashboard,
+  CalendarView,
+  MedicationsView,
   DiagnosesView,
   DiaryView,
   RemindersView,
   QuestionsView,
   OverallAnalysisView,
   NotebookView,
-  DoctorVisitsView
+  DoctorVisitsView,
+  ProfileView
 } from './views';
 import './styles/index.css';
 import './App.css';
@@ -356,18 +359,36 @@ const loadTestData = () => {
 function AppContent() {
   const { state } = useApp();
   const { activeView } = state;
-  
+  const { user, loading, isSupabaseEnabled } = useAuth();
+
   // Initialize reminders
   useReminders();
 
-  // Ladda testdata vid första körningen
+  // Ladda testdata vid första körningen (endast om Supabase inte är aktiverat)
   useEffect(() => {
-    const loaded = loadTestData();
-    if (loaded) {
-      // Ladda om sidan för att hämta data i context
-      window.location.reload();
+    if (!isSupabaseEnabled) {
+      const loaded = loadTestData();
+      if (loaded) {
+        // Ladda om sidan för att hämta data i context
+        window.location.reload();
+      }
     }
-  }, []);
+  }, [isSupabaseEnabled]);
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="app-loading">
+        <div className="spinner" />
+        <p>Laddar...</p>
+      </div>
+    );
+  }
+
+  // If Supabase is enabled and user is not authenticated, show auth page
+  if (isSupabaseEnabled && !user) {
+    return <AuthPage />;
+  }
 
   const renderView = () => {
     switch (activeView) {
@@ -391,6 +412,8 @@ function AppContent() {
         return <NotebookView />;
       case 'visits':
         return <DoctorVisitsView />;
+      case 'profile':
+        return <ProfileView />;
       default:
         return <Dashboard />;
     }
@@ -428,9 +451,11 @@ function AppContent() {
 
 function App() {
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <AuthProvider>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </AuthProvider>
   );
 }
 

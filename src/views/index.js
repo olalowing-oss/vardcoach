@@ -8,3 +8,4 @@ export { QuestionsView } from './QuestionsView';
 export { OverallAnalysisView } from './OverallAnalysisView';
 export { NotebookView } from './NotebookView';
 export { DoctorVisitsView } from './DoctorVisitsView';
+export { ProfileView } from './ProfileView';
