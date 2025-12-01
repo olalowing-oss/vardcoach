@@ -1,0 +1,142 @@
+.doctor-visits-view {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.filter-row {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.visits-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.visit-card {
+  border-left: 4px solid var(--color-primary);
+}
+
+.visit-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.visit-title {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-bold);
+  cursor: pointer;
+}
+
+.visit-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.visit-date {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+.visit-meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  margin: var(--space-sm) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.visit-doctor {
+  font-weight: var(--font-semibold);
+}
+
+.visit-location,
+.visit-time {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+}
+
+.visit-notes {
+  margin: 0;
+  color: var(--color-gray-800);
+  line-height: 1.6;
+}
+
+.visit-detail-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.visit-ai-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.visit-ai-result {
+  background: var(--bg-subtle);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+}
+
+.visit-ai-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-md);
+}
+
+.visit-ai-history {
+  margin-top: var(--space-lg);
+}
+
+.ai-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.ai-history-item {
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  cursor: pointer;
+}
+
+.ai-history-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+/* Shared form layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+@media (min-width: 640px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

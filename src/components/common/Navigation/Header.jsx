@@ -4,11 +4,12 @@ import './Header.css';
 
 const VIEW_TITLES = {
   dashboard: 'Hem',
-  analysis: 'Övergripande analys',
+  analysis: 'Helhetsanalys',
   calendar: 'Kalender',
   diagnoses: 'Diagnoser',
   medications: 'Läkemedel',
   diary: 'Hälsodagbok',
+  visits: 'Läkarbesök',
   reminders: 'Påminnelser',
   questions: 'Frågor till läkaren',
   notebook: 'Anteckningsbok',

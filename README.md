@@ -7,10 +7,11 @@ En komplett React-app för att hantera din hälsa med stöd för mobil och deskt
 ### Huvudfunktioner
 - **Hem** - Översikt över din hälsa
 - **Anteckningsbok** - Fri anteckningsyta för tankar och observationer
-- **Övergripande analys** - AI som analyserar alla diagnoser + läkemedel
+- **Helhetsanalys** - AI som analyserar alla diagnoser + läkemedel
 - **Kalender** - Månadsvy och besökshantering
 - **Diagnoser** - Registrering med AI-analys
 - **Läkemedel** - Dosering och dagligt intag
+- **Läkarbesök** - Anteckna vad som sades hos läkaren
 - **Hälsodagbok** - Humör och symtom
 - **Påminnelser** - Webbnotifikationer
 - **Frågor** - AI-genererade frågor till läkaren
@@ -55,6 +56,7 @@ vårdcoachen/
 │   │   ├── CalendarView.jsx
 │   │   ├── MedicationsView.jsx
 │   │   ├── DiagnosesView.jsx
+│   │   ├── DoctorVisitsView.jsx
 │   │   ├── NotebookView.jsx
 │   │   ├── OverallAnalysisView.jsx
 │   │   ├── DiaryView.jsx
@@ -150,12 +152,30 @@ Appen använder OpenAI:s Chat Completions API för:
 
 ### Konfiguration
 1. Skapa en fil som heter `.env.local` i projektroten.
-2. Kopiera innehållet från `.env.example` och klistra in i `.env.local`.
-3. Fyll i `REACT_APP_OPENAI_API_KEY` med din OpenAI-nyckel.
-4. Valfritt: ändra `REACT_APP_OPENAI_MODEL` (t.ex. `gpt-4o-mini`).
-5. Starta om `npm start` efter att du lagt till/ändrat nycklar.
+2. Kopiera innehållet från `src/.env.example` och klistra in i `.env.local`.
+3. Fyll i `OPENAI_API_KEY` (används endast av backend-proxyn och ligger därmed inte i bundle).
+4. Valfritt: ändra `REACT_APP_OPENAI_MODEL` (t.ex. `gpt-4o-mini`) eller `REACT_APP_AI_PROXY_URL` om du har en extern server.
+5. Starta om både backend och frontend efter ändringar.
 
-> För produktion rekommenderas att du skapar en enkel backend-proxy så att API-nyckeln inte exponeras i klientkoden.
+### Backend-proxy
+OpenAI-blockerar webbläsare direkt, därför finns en enkel Express-proxy i `server/index.js`.
+
+```bash
+# Installera beroenden (engångs)
+npm install
+
+# Starta proxyservern (lyssnar på http://localhost:5001)
+npm run server
+
+# I en annan terminal
+npm start   # startar React-appen, proxyn fångar upp /api/ai
+```
+
+- Backend läser `OPENAI_API_KEY` från `.env.local` (eller `.env`/miljön när du deployar).
+- I lokal utveckling fungerar allt tack vare `proxy`-fältet i `package.json`.
+- I produktion sätter du `REACT_APP_AI_PROXY_URL` till den URL där du hostar servern (t.ex. en Vercel/Render/Heroku-endpoint) och deployar `server/index.js` som backend.
+
+> Din OpenAI-nyckel ska inte längre ligga i `REACT_APP_*`. All känslig information stannar på servern.
 
 ## ☁️ Supabase-synk (valfri)
 
@@ -187,6 +207,8 @@ All data lagras lokalt i webbläsarens localStorage:
 - `vårdcoachen-aiNotes`
 - `vårdcoachen-overallAiNotes`
 - `vårdcoachen-medicationLog`
+- `vårdcoachen-doctorVisits`
+- `vårdcoachen-visitAiNotes`
 - `vårdcoachen-notes`
 - `vårdcoachen-profile-id` (endast när Supabase används)
 

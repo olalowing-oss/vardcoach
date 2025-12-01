@@ -47,7 +47,7 @@ export function BottomNav() {
                 }}
               >
                 <span className="mobile-menu-icon">🩺</span>
-                <span>Övergripande analys</span>
+                <span>Helhetsanalys</span>
               </button>
               <button 
                 className={`mobile-menu-item ${activeView === 'notebook' ? 'active' : ''}`}
@@ -68,6 +68,16 @@ export function BottomNav() {
               >
                 <span className="mobile-menu-icon">🔬</span>
                 <span>Diagnoser</span>
+              </button>
+              <button 
+                className={`mobile-menu-item ${activeView === 'visits' ? 'active' : ''}`}
+                onClick={() => {
+                  actions.setView('visits');
+                  actions.toggleMobileMenu();
+                }}
+              >
+                <span className="mobile-menu-icon">🏥</span>
+                <span>Läkarbesök</span>
               </button>
               <button 
                 className={`mobile-menu-item ${activeView === 'reminders' ? 'active' : ''}`}
@@ -111,7 +121,7 @@ export function BottomNav() {
       <nav className="bottom-nav">
         {NAV_ITEMS.map((item) => {
           const isActive = item.id === 'more' 
-            ? mobileMenuOpen || ['analysis', 'notebook', 'diagnoses', 'reminders', 'questions'].includes(activeView)
+            ? mobileMenuOpen || ['analysis', 'notebook', 'diagnoses', 'visits', 'reminders', 'questions'].includes(activeView)
             : activeView === item.id;
           
           return (

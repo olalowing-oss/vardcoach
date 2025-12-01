@@ -4,7 +4,9 @@ import { styles, colors } from '../styles/styles';
 const navItems = [
   { id: 'dashboard', label: 'Översikt', icon: '🏠' },
   { id: 'calendar', label: 'Kalender', icon: '📅' },
+  { id: 'analysis', label: 'Helhetsanalys', icon: '🩺' },
   { id: 'diagnosis', label: 'Diagnoser', icon: '🔬' },
+  { id: 'visits', label: 'Läkarbesök', icon: '🏥' },
   { id: 'medications', label: 'Läkemedel', icon: '💊' },
   { id: 'diary', label: 'Dagbok', icon: '📔' },
   { id: 'reminders', label: 'Påminnelser', icon: '🔔' },
@@ -15,8 +17,8 @@ const navItems = [
 const mobileNavItems = [
   { id: 'dashboard', label: 'Hem', icon: '🏠' },
   { id: 'calendar', label: 'Kalender', icon: '📅' },
+  { id: 'analysis', label: 'Helhetsanalys', icon: '🩺' },
   { id: 'medications', label: 'Läkemedel', icon: '💊' },
-  { id: 'diary', label: 'Dagbok', icon: '📔' },
   { id: 'more', label: 'Mer', icon: '☰' },
 ];
 
@@ -100,7 +102,9 @@ export function MobileMenu({ isOpen, onClose, activeView, setActiveView, reminde
   if (!isOpen) return null;
 
   const menuItems = [
+    { id: 'analysis', label: 'Helhetsanalys', icon: '🩺' },
     { id: 'diagnosis', label: 'Diagnoser', icon: '🔬' },
+    { id: 'visits', label: 'Läkarbesök', icon: '🏥' },
     { id: 'reminders', label: 'Påminnelser', icon: '🔔', badge: reminderCount },
     { id: 'questions', label: 'Frågor till läkaren', icon: '❓' },
   ];

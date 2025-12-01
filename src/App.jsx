@@ -13,7 +13,8 @@ import {
   RemindersView,
   QuestionsView,
   OverallAnalysisView,
-  NotebookView
+  NotebookView,
+  DoctorVisitsView
 } from './views';
 import './styles/index.css';
 import './App.css';
@@ -300,11 +301,48 @@ const loadTestData = () => {
     }
   ];
 
+  const testDoctorVisits = [
+    {
+      id: generateId(),
+      date: addDays(today, -10).toISOString().split('T')[0],
+      diagnosisId: testDiagnoses[0]?.id || '',
+      appointmentId: testAppointments[3]?.id || '',
+      title: 'Uppföljning hypertoni',
+      time: '09:30',
+      location: 'Vårdcentralen Centrum',
+      doctor: 'Dr. Anna Lindqvist',
+      type: 'checkup',
+      purpose: 'Följa upp blodtryck och justering av medicinering',
+      prepNotes: 'Ta med blodtryckslogg från senaste två veckorna',
+      reminder: true,
+      notes: 'Genomgång av blodtryckslogg. Rekommendation att fortsätta med nuvarande dos och boka ny kontroll om 3 månader.',
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: generateId(),
+      date: addDays(today, -3).toISOString().split('T')[0],
+      diagnosisId: testDiagnoses[1]?.id || '',
+      appointmentId: testAppointments[0]?.id || '',
+      title: 'Diabeteskontroll',
+      time: '11:00',
+      location: 'Diabetesmottagningen',
+      doctor: 'Dr. Erik Johansson',
+      type: 'followup',
+      purpose: 'Gå igenom senaste prover och justera kost/motion',
+      prepNotes: 'Mät blodsocker morgon och kväll tre dagar innan besöket',
+      reminder: true,
+      notes: 'Diskussion om kost och motion. Sätt upp mål att minska HbA1c till nästa besök.',
+      createdAt: new Date().toISOString(),
+    }
+  ];
+
   // Spara till localStorage
   localStorage.setItem('vardcoachen-diagnoses', JSON.stringify(testDiagnoses));
   localStorage.setItem('vardcoachen-medications', JSON.stringify(testMedications));
   localStorage.setItem('vardcoachen-appointments', JSON.stringify(testAppointments));
   localStorage.setItem('vardcoachen-diary', JSON.stringify(testDiaryEntries));
+  localStorage.setItem('vardcoachen-doctorVisits', JSON.stringify(testDoctorVisits));
+  localStorage.setItem('vardcoachen-visitAiNotes', JSON.stringify({}));
 
   console.log('✅ Testdata har laddats!');
   console.log(`   - ${testDiagnoses.length} diagnoser`);
@@ -351,6 +389,8 @@ function AppContent() {
         return <OverallAnalysisView />;
       case 'notebook':
         return <NotebookView />;
+      case 'visits':
+        return <DoctorVisitsView />;
       default:
         return <Dashboard />;
     }

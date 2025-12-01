@@ -31,23 +31,38 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: var(--space-md);
   flex-wrap: wrap;
-  gap: var(--space-sm);
   margin-bottom: var(--space-sm);
 }
 
-.diag-name {
+.diag-header-main {
+  flex: 1;
+  min-width: 200px;
+}
+
+.diag-title {
+  background: none;
+  border: none;
+  padding: 0;
   font-size: var(--font-size-xl);
   font-weight: var(--font-bold);
-  color: var(--color-gray-900);
+  color: var(--color-primary);
+  cursor: pointer;
 }
 
 .diag-date {
   font-size: var(--font-size-sm);
   color: var(--color-gray-500);
-  background: var(--color-gray-100);
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-full);
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.diag-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .diag-doctor {
@@ -76,25 +91,11 @@
   font-weight: var(--font-semibold);
 }
 
-.diag-footer {
+.diag-detail-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: var(--space-sm);
-  border-top: 1px solid var(--color-gray-200);
-}
-
-.edit-btn {
-  background: transparent;
-  border: none;
-  color: var(--color-gray-600);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  padding: 0.5rem;
-}
-
-.edit-btn:hover {
-  color: var(--color-primary);
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
 }
 
 /* Empty state */

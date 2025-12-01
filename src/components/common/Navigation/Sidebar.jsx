@@ -5,8 +5,9 @@ import './Sidebar.css';
 
 const NAV_ITEMS = [
   { id: 'dashboard', icon: '🏠', label: 'Hem' },
-  { id: 'analysis', icon: '🩺', label: 'Övergripande analys' },
+  { id: 'analysis', icon: '🩺', label: 'Helhetsanalys' },
   { id: 'calendar', icon: '📅', label: 'Kalender' },
+  { id: 'visits', icon: '🏥', label: 'Läkarbesök' },
   { id: 'diagnoses', icon: '🔬', label: 'Diagnoser' },
   { id: 'medications', icon: '💊', label: 'Läkemedel' },
   { id: 'diary', icon: '📔', label: 'Hälsodagbok' },

@@ -2,48 +2,34 @@ import { useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 
 const DEFAULT_MODEL = process.env.REACT_APP_OPENAI_MODEL || 'gpt-4o-mini';
-const API_URL = 'https://api.openai.com/v1/chat/completions';
+const API_URL = process.env.REACT_APP_AI_PROXY_URL || '/api/ai';
 
 export function useAI() {
   const { state, actions } = useApp();
   const { isLoading } = state;
 
   const analyzeWithAI = useCallback(async (prompt, options = {}) => {
-    const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
-
-    if (!apiKey) {
-      const missingKeyMessage = 'Ingen OpenAI-nyckel hittades. Lägg till REACT_APP_OPENAI_API_KEY i din .env-fil.';
-      actions.setAiResponse(missingKeyMessage);
-      return missingKeyMessage;
-    }
-
     actions.setLoading(true);
     actions.setAiResponse(null);
 
     try {
-      const systemPrompt = options.systemPrompt || 'Du är en hjälpsam svensk vårdassistent som svarar med tydliga men försiktiga formuleringar.';
-      const messages = [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: prompt }
-      ];
-
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: options.model || DEFAULT_MODEL,
-          temperature: options.temperature ?? 0.2,
-          max_tokens: options.maxTokens || 600,
-          messages,
+          prompt,
+          options: {
+            ...options,
+            model: options.model || DEFAULT_MODEL,
+          },
         }),
       });
 
       if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(`OpenAI error ${response.status}: ${errorBody}`);
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody?.error || `API error ${response.status}`);
       }
 
       const data = await response.json();
@@ -158,7 +144,7 @@ Påminn om att informationen inte ersätter medicinsk rådgivning.`;
 
   const analyzeOverallHealth = useCallback((diagnoses = [], medications = []) => {
     if (!diagnoses.length) {
-      return Promise.resolve('Lägg till minst en diagnos för att kunna göra en övergripande analys.');
+      return Promise.resolve('Lägg till minst en diagnos för att kunna göra en helhetsanalys.');
     }
 
     const diagnosisSummary = diagnoses.map((diag, index) => {
@@ -185,7 +171,7 @@ Påminn om att informationen inte ersätter medicinsk rådgivning.`;
 
     const prompt = `Du är en försiktig medicinsk informationsassistent i appen Vårdcoachen.
 
-Användaren vill få en övergripande analys av sina pågående diagnoser och läkemedel för att identifiera möjliga samband eller saker att diskutera med vården.
+Användaren vill få en helhetsanalys av sina pågående diagnoser och läkemedel för att identifiera möjliga samband eller saker att diskutera med vården.
 
 Diagnoser:
 ${diagnosisSummary}
@@ -228,6 +214,23 @@ Svara kort och tydligt på svenska (max 200 ord) och påminn om att informatione
     return analyzeWithAI(prompt, { maxTokens: 700, temperature: 0.3 });
   }, [analyzeWithAI]);
 
+  const analyzeDoctorVisit = useCallback((visit, diagnosis) => {
+    const prompt = `Du är en assistent som hjälper patienten att analysera vad som togs upp vid ett läkarbesök.
+
+Besöksdatum: ${visit.date}
+Diagnos: ${diagnosis ? diagnosis.name : 'Ej vald'}
+Anteckningar från besöket: ${visit.notes || 'Ingen anteckning angiven'}
+
+Sammanfatta:
+1. Viktiga punkter från besöket
+2. Eventuella uppföljningar eller åtgärder
+3. Frågor som kan vara bra att ställa nästa gång
+
+Svara kort på svenska och påminn om att kontakta vården vid frågor.`;
+
+    return analyzeWithAI(prompt, { maxTokens: 700, temperature: 0.3 });
+  }, [analyzeWithAI]);
+
   return {
     isLoading,
     analyzeWithAI,
@@ -237,6 +240,7 @@ Svara kort och tydligt på svenska (max 200 ord) och påminn om att informatione
     askOverallFollowUp,
     generateQuestions,
     analyzeDiaryPatterns,
+    analyzeDoctorVisit,
   };
 }
 

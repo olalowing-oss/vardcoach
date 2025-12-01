@@ -12,6 +12,8 @@ const defaultDataShape = {
   aiNotes: {},
   overallAiNotes: [],
   medicationLog: {},
+  doctorVisits: [],
+  visitAiNotes: {},
   notes: [],
 };
 
@@ -27,6 +29,8 @@ const normalizeDataShape = (data = {}) => ({
   aiNotes: typeof data.aiNotes === 'object' && data.aiNotes !== null ? data.aiNotes : {},
   overallAiNotes: Array.isArray(data.overallAiNotes) ? data.overallAiNotes : [],
   medicationLog: typeof data.medicationLog === 'object' && data.medicationLog !== null ? data.medicationLog : {},
+  doctorVisits: Array.isArray(data.doctorVisits) ? data.doctorVisits : [],
+  visitAiNotes: typeof data.visitAiNotes === 'object' && data.visitAiNotes !== null ? data.visitAiNotes : {},
   notes: Array.isArray(data.notes) ? data.notes : [],
 });
 
@@ -54,6 +58,8 @@ const loadLocalData = () => {
     aiNotes: safeParse('aiNotes', {}),
     overallAiNotes: safeParse('overallAiNotes', []),
     medicationLog: safeParse('medicationLog', {}),
+    doctorVisits: safeParse('doctorVisits', []),
+    visitAiNotes: safeParse('visitAiNotes', {}),
     notes: safeParse('notes', []),
   });
 };
@@ -80,6 +86,8 @@ const initialState = {
   aiNotes: {},
   overallAiNotes: [],
   medicationLog: {},
+  doctorVisits: [],
+  visitAiNotes: {},
   notes: [],
 };
 
@@ -97,6 +105,9 @@ const ACTIONS = {
   SET_DIARY: 'SET_DIARY',
   ADD_DIARY_ENTRY: 'ADD_DIARY_ENTRY',
   DELETE_DIARY_ENTRY: 'DELETE_DIARY_ENTRY',
+  ADD_VISIT: 'ADD_VISIT',
+  UPDATE_VISIT: 'UPDATE_VISIT',
+  DELETE_VISIT: 'DELETE_VISIT',
   ADD_NOTE: 'ADD_NOTE',
   UPDATE_NOTE: 'UPDATE_NOTE',
   DELETE_NOTE: 'DELETE_NOTE',
@@ -117,6 +128,8 @@ const ACTIONS = {
   ADD_OVERALL_AI_NOTE: 'ADD_OVERALL_AI_NOTE',
   DELETE_OVERALL_AI_NOTE: 'DELETE_OVERALL_AI_NOTE',
   SET_MEDICATION_INTAKE: 'SET_MEDICATION_INTAKE',
+  ADD_VISIT_ANALYSIS: 'ADD_VISIT_ANALYSIS',
+  DELETE_VISIT_ANALYSIS: 'DELETE_VISIT_ANALYSIS',
 };
 
 // Reducer
@@ -176,6 +189,27 @@ function appReducer(state, action) {
         ...state,
         diaryEntries: state.diaryEntries.filter(e => e.id !== action.payload)
       };
+
+    case ACTIONS.ADD_VISIT:
+      return { ...state, doctorVisits: [action.payload, ...state.doctorVisits] };
+
+    case ACTIONS.UPDATE_VISIT:
+      return {
+        ...state,
+        doctorVisits: state.doctorVisits.map(v =>
+          v.id === action.payload.id ? action.payload : v
+        )
+      };
+
+    case ACTIONS.DELETE_VISIT: {
+      const updated = { ...state.visitAiNotes };
+      delete updated[action.payload];
+      return {
+        ...state,
+        doctorVisits: state.doctorVisits.filter(v => v.id !== action.payload),
+        visitAiNotes: updated,
+      };
+    }
 
     case ACTIONS.ADD_NOTE:
       return { ...state, notes: [action.payload, ...state.notes] };
@@ -279,6 +313,29 @@ function appReducer(state, action) {
         ...state,
         overallAiNotes: state.overallAiNotes.filter(note => note.id !== action.payload)
       };
+
+    case ACTIONS.ADD_VISIT_ANALYSIS: {
+      const { visitId, note } = action.payload;
+      const existing = state.visitAiNotes[visitId] || [];
+      return {
+        ...state,
+        visitAiNotes: {
+          ...state.visitAiNotes,
+          [visitId]: [...existing, note]
+        }
+      };
+    }
+
+    case ACTIONS.DELETE_VISIT_ANALYSIS: {
+      const { visitId, noteId } = action.payload;
+      return {
+        ...state,
+        visitAiNotes: {
+          ...state.visitAiNotes,
+          [visitId]: (state.visitAiNotes[visitId] || []).filter(note => note.id !== noteId)
+        }
+      };
+    }
 
     case ACTIONS.SET_MEDICATION_INTAKE: {
       const { date, medId, taken } = action.payload;
@@ -438,6 +495,16 @@ export function AppProvider({ children }) {
   }, [state.notes]);
 
   useEffect(() => {
+    if (!hasHydrated.current) return;
+    localStorage.setItem('vardcoachen-doctorVisits', JSON.stringify(state.doctorVisits));
+  }, [state.doctorVisits]);
+
+  useEffect(() => {
+    if (!hasHydrated.current) return;
+    localStorage.setItem('vardcoachen-visitAiNotes', JSON.stringify(state.visitAiNotes));
+  }, [state.visitAiNotes]);
+
+  useEffect(() => {
     if (
       !hasHydrated.current ||
       !isSupabaseEnabled ||
@@ -456,6 +523,8 @@ export function AppProvider({ children }) {
       aiNotes: state.aiNotes,
       overallAiNotes: state.overallAiNotes,
       medicationLog: state.medicationLog,
+      doctorVisits: state.doctorVisits,
+      visitAiNotes: state.visitAiNotes,
       notes: state.notes,
     };
 
@@ -515,6 +584,11 @@ export function AppProvider({ children }) {
     updateAppointment: (appointment) => dispatch({ type: ACTIONS.UPDATE_APPOINTMENT, payload: appointment }),
     deleteAppointment: (id) => dispatch({ type: ACTIONS.DELETE_APPOINTMENT, payload: id }),
     setSelectedAppointment: (apt) => dispatch({ type: ACTIONS.SET_SELECTED_APPOINTMENT, payload: apt }),
+    addVisit: (visit) => dispatch({ type: ACTIONS.ADD_VISIT, payload: visit }),
+    updateVisit: (visit) => dispatch({ type: ACTIONS.UPDATE_VISIT, payload: visit }),
+    deleteVisit: (id) => dispatch({ type: ACTIONS.DELETE_VISIT, payload: id }),
+    addVisitAnalysis: (visitId, note) => dispatch({ type: ACTIONS.ADD_VISIT_ANALYSIS, payload: { visitId, note } }),
+    deleteVisitAnalysis: (visitId, noteId) => dispatch({ type: ACTIONS.DELETE_VISIT_ANALYSIS, payload: { visitId, noteId } }),
     
     // Notifications
     addNotification: (message, type = 'info') => {

@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { styles, colors } from '../styles/styles';
 import { formatDate } from '../utils/helpers';
 
 export function Diagnoses({ diagnoses, setDiagnoses, ai, isMobile }) {
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [detailDiag, setDetailDiag] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     date: new Date().toISOString().split('T')[0],
@@ -12,14 +15,11 @@ export function Diagnoses({ diagnoses, setDiagnoses, ai, isMobile }) {
     treatments: '',
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newDiagnosis = {
-      ...formData,
-      id: Date.now(),
-      createdAt: new Date().toISOString(),
-    };
-    setDiagnoses([...diagnoses, newDiagnosis]);
+  const sortedDiagnoses = useMemo(() => (
+    [...diagnoses].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+  ), [diagnoses]);
+
+  const resetForm = () => {
     setFormData({
       name: '',
       date: new Date().toISOString().split('T')[0],
@@ -27,12 +27,50 @@ export function Diagnoses({ diagnoses, setDiagnoses, ai, isMobile }) {
       description: '',
       treatments: '',
     });
+    setEditingId(null);
+  };
+
+  const handleToggleForm = () => {
+    if (showForm) {
+      setShowForm(false);
+      resetForm();
+    } else {
+      resetForm();
+      setShowForm(true);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.name.trim()) return;
+
+    if (editingId) {
+      setDiagnoses(diagnoses.map(d => (
+        d.id === editingId ? { ...d, ...formData } : d
+      )));
+    } else {
+      const newDiagnosis = {
+        ...formData,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+      };
+      setDiagnoses([...diagnoses, newDiagnosis]);
+    }
+
+    resetForm();
     setShowForm(false);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Är du säker på att du vill ta bort denna diagnos?')) {
-      setDiagnoses(diagnoses.filter(d => d.id !== id));
+  const handleDelete = (diagnosis) => {
+    if (!window.confirm('Är du säker på att du vill ta bort denna diagnos?')) return;
+    setDiagnoses(diagnoses.filter(d => d.id !== diagnosis.id));
+    if (editingId === diagnosis.id) {
+      resetForm();
+      setShowForm(false);
+    }
+    if (detailDiag?.id === diagnosis.id) {
+      setShowDetailModal(false);
+      setDetailDiag(null);
     }
   };
 
@@ -40,11 +78,40 @@ export function Diagnoses({ diagnoses, setDiagnoses, ai, isMobile }) {
     ai.analyzeDiagnosis(diagnosis);
   };
 
+  const handleOpenEdit = (diagnosis) => {
+    setFormData({
+      name: diagnosis.name || '',
+      date: diagnosis.date || new Date().toISOString().split('T')[0],
+      doctor: diagnosis.doctor || '',
+      description: diagnosis.description || '',
+      treatments: diagnosis.treatments || '',
+    });
+    setEditingId(diagnosis.id);
+    setShowForm(true);
+  };
+
+  const openDetailModal = (diagnosis) => {
+    setDetailDiag(diagnosis);
+    setShowDetailModal(true);
+  };
+
+  const closeDetailModal = () => {
+    setDetailDiag(null);
+    setShowDetailModal(false);
+  };
+
+  const getSnippet = (text = '') => {
+    if (!text) return '';
+    const sentences = text.split(/(?<=[.!?])\s+/);
+    const snippet = sentences.slice(0, 2).join(' ');
+    return sentences.length > 2 ? `${snippet} …` : snippet;
+  };
+
   return (
     <div style={styles.contentInner}>
       <div style={styles.pageHeader}>
         <h2 style={styles.pageTitle}>🔬 Diagnoser</h2>
-        <button style={styles.button} onClick={() => setShowForm(!showForm)}>
+        <button style={styles.button} onClick={handleToggleForm}>
           {showForm ? 'Avbryt' : '+ Lägg till'}
         </button>
       </div>
@@ -114,51 +181,149 @@ export function Diagnoses({ diagnoses, setDiagnoses, ai, isMobile }) {
           <p style={styles.emptyText}>Inga diagnoser registrerade</p>
         </div>
       ) : (
-        diagnoses.map(diag => (
+        sortedDiagnoses.map(diag => (
           <div key={diag.id} style={styles.card}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <h4 style={{ margin: 0 }}>{diag.name}</h4>
-              <span style={{ ...styles.badge, ...styles.badgeGray }}>
-                {formatDate(diag.date)}
-              </span>
+            <div style={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              justifyContent: 'space-between',
+              alignItems: isMobile ? 'flex-start' : 'center',
+              gap: '0.75rem',
+              marginBottom: '0.5rem',
+            }}>
+              <div style={{ flex: 1 }}>
+                <button
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    color: colors.primary,
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                  onClick={() => openDetailModal(diag)}
+                >
+                  {diag.name}
+                </button>
+                <div style={{ color: colors.textMuted, fontSize: '0.85rem', marginTop: '0.2rem' }}>
+                  {formatDate(diag.date)}
+                </div>
+              </div>
+              <div style={{
+                display: 'flex',
+                gap: '0.5rem',
+                flexWrap: 'wrap',
+                justifyContent: isMobile ? 'flex-start' : 'flex-end',
+              }}>
+              <button
+                style={{ ...styles.button, ...styles.buttonGhost }}
+                onClick={() => handleAnalyze(diag)}
+                disabled={ai.isLoading}
+              >
+                {ai.isLoading ? '⏳ Analyserar...' : '🤖 AI-analys'}
+                </button>
+                <button
+                  style={{ ...styles.button, ...styles.buttonGhost }}
+                  onClick={() => handleOpenEdit(diag)}
+                >
+                  ✏️ Redigera
+                </button>
+                <button
+                  style={{ ...styles.button, ...styles.buttonGhost }}
+                  onClick={() => handleDelete(diag)}
+                >
+                  🗑 Ta bort
+                </button>
+              </div>
             </div>
+
             {diag.doctor && (
-              <p style={{ color: colors.textLight, margin: '0.5rem 0' }}>
+              <p style={{ color: colors.textLight, margin: '0.25rem 0' }}>
                 👨‍⚕️ {diag.doctor}
               </p>
             )}
+
             {diag.description && (
               <p style={{ color: colors.textLight, lineHeight: 1.6, margin: '0.5rem 0' }}>
-                {diag.description}
+                {getSnippet(diag.description)}
               </p>
             )}
+
             {diag.treatments && (
               <div style={{
                 background: '#f8faf9',
                 padding: '0.75rem 1rem',
                 borderRadius: '8px',
-                margin: '0.75rem 0',
+                marginBottom: '0.5rem',
               }}>
                 <strong>💊 Behandling:</strong> {diag.treatments}
               </div>
             )}
-            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-              <button
-                style={{ ...styles.button, ...styles.buttonSecondary }}
-                onClick={() => handleAnalyze(diag)}
-                disabled={ai.isLoading}
-              >
-                {ai.isLoading ? '⏳ Analyserar...' : '🤖 Analysera med AI'}
-              </button>
-              <button
-                style={{ ...styles.button, ...styles.buttonDanger }}
-                onClick={() => handleDelete(diag.id)}
-              >
-                🗑️
-              </button>
-            </div>
           </div>
         ))
+      )}
+
+      {/* Detail Modal */}
+      {showDetailModal && detailDiag && (
+        <div style={styles.overlay} onClick={closeDetailModal}>
+          <div
+            style={{ ...styles.modal, maxWidth: '600px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={styles.modalHeader}>
+              <h3 style={styles.modalTitle}>{detailDiag.name}</h3>
+              <button style={styles.modalClose} onClick={closeDetailModal}>
+                ✕
+              </button>
+            </div>
+            <div style={styles.modalBody}>
+              <p><strong>Datum:</strong> {formatDate(detailDiag.date)}</p>
+              {detailDiag.doctor && <p><strong>Läkare:</strong> {detailDiag.doctor}</p>}
+              {detailDiag.description && (
+                <>
+                  <p><strong>Beskrivning:</strong></p>
+                  <p>{detailDiag.description}</p>
+                </>
+              )}
+              {detailDiag.treatments && (
+                <p><strong>Behandling:</strong> {detailDiag.treatments}</p>
+              )}
+              <div style={{
+                display: 'flex',
+                gap: '0.5rem',
+                flexWrap: 'wrap',
+                marginTop: '1rem',
+              }}>
+                <button
+                  style={{ ...styles.button, ...styles.buttonSecondary }}
+                  onClick={() => {
+                    handleAnalyze(detailDiag);
+                    closeDetailModal();
+                  }}
+                >
+                  🤖 AI-analys
+                </button>
+                <button
+                  style={{ ...styles.button, ...styles.buttonGhost }}
+                  onClick={() => {
+                    closeDetailModal();
+                    handleOpenEdit(detailDiag);
+                  }}
+                >
+                  ✏️ Redigera
+                </button>
+                <button
+                  style={{ ...styles.button, ...styles.buttonGhost }}
+                  onClick={() => handleDelete(detailDiag)}
+                >
+                  🗑 Ta bort
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* AI Response */}

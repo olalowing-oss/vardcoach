@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { useAI } from '../hooks/useAI';
 import { Card, Button, Modal, Input, Textarea } from '../components/common';
@@ -13,11 +13,14 @@ export function DiagnosesView() {
   const [showModal, setShowModal] = useState(false);
   const [selectedDiag, setSelectedDiag] = useState(null);
   const [aiAnalysis, setAiAnalysis] = useState(null);
-  const [showAiModal, setShowAiModal] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState('');
   const [hasSavedResponse, setHasSavedResponse] = useState(false);
   const [followupQuestion, setFollowupQuestion] = useState('');
   const [activeHistoryId, setActiveHistoryId] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [detailDiag, setDetailDiag] = useState(null);
+  const [focusAiSection, setFocusAiSection] = useState(false);
+  const aiSectionRef = useRef(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -70,6 +73,15 @@ export function DiagnosesView() {
     }
   };
 
+  const handleDeleteQuick = (diag) => {
+    if (window.confirm('Vill du ta bort denna diagnos?')) {
+      actions.deleteDiagnosis(diag.id);
+      if (detailDiag?.id === diag.id) {
+        closeDetailModal();
+      }
+    }
+  };
+
   const getSortedResponses = (diagId) => {
     if (!diagId || !aiNotes) return [];
     const responses = aiNotes[diagId] || [];
@@ -80,10 +92,9 @@ export function DiagnosesView() {
     });
   };
 
-  const openAiModal = (diag) => {
+  const initializeAiView = (diag) => {
+    if (!diag) return;
     const sorted = getSortedResponses(diag.id);
-    setSelectedDiag(diag);
-    setShowAiModal(true);
     setFollowupQuestion('');
 
     if (sorted.length > 0) {
@@ -100,18 +111,42 @@ export function DiagnosesView() {
     }
   };
 
+  const openDetailView = (diag, focusAi = false) => {
+    setDetailDiag(diag);
+    setShowDetailModal(true);
+    initializeAiView(diag);
+    setFocusAiSection(focusAi);
+  };
+
+  const closeDetailModal = () => {
+    setShowDetailModal(false);
+    setDetailDiag(null);
+    setAiAnalysis(null);
+    setCurrentQuestion('');
+    setHasSavedResponse(false);
+    setActiveHistoryId(null);
+    setFollowupQuestion('');
+  };
+
+  useEffect(() => {
+    if (showDetailModal && focusAiSection && aiSectionRef.current) {
+      aiSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setFocusAiSection(false);
+    }
+  }, [showDetailModal, focusAiSection]);
+
   const handleRunNewAnalysis = async () => {
-    if (!selectedDiag) return;
+    if (!detailDiag) return;
     setAiAnalysis(null);
     setCurrentQuestion('Översiktlig analys');
     setHasSavedResponse(false);
     setActiveHistoryId(null);
-    const result = await analyzeDiagnosis(selectedDiag);
+    const result = await analyzeDiagnosis(detailDiag);
     setAiAnalysis(result);
   };
 
   const handleSaveCurrentResponse = () => {
-    if (!selectedDiag || !aiAnalysis || hasSavedResponse) return;
+    if (!detailDiag || !aiAnalysis || hasSavedResponse) return;
 
     const note = {
       id: generateId(),
@@ -120,14 +155,14 @@ export function DiagnosesView() {
       createdAt: new Date().toISOString(),
     };
 
-    actions.addAiNote(selectedDiag.id, note);
+    actions.addAiNote(detailDiag.id, note);
     actions.addNotification('AI-svar sparat', 'success');
     setHasSavedResponse(true);
     setActiveHistoryId(note.id);
   };
 
   const handleFollowupSubmit = async () => {
-    if (!selectedDiag || !followupQuestion.trim()) return;
+    if (!detailDiag || !followupQuestion.trim()) return;
 
     const question = followupQuestion.trim();
     setAiAnalysis(null);
@@ -135,16 +170,16 @@ export function DiagnosesView() {
     setHasSavedResponse(false);
     setActiveHistoryId(null);
     
-    const result = await askDiagnosisFollowUp(selectedDiag, question);
+    const result = await askDiagnosisFollowUp(detailDiag, question);
     setAiAnalysis(result);
     setFollowupQuestion('');
   };
 
   const handleDeleteSavedResponse = (noteId) => {
-    if (!selectedDiag) return;
+    if (!detailDiag) return;
     const confirmed = window.confirm('Ta bort detta sparade svar?');
     if (!confirmed) return;
-    actions.deleteAiNote(selectedDiag.id, noteId);
+    actions.deleteAiNote(detailDiag.id, noteId);
     actions.addNotification('AI-svar borttaget', 'info');
     if (activeHistoryId === noteId) {
       setAiAnalysis(null);
@@ -154,7 +189,15 @@ export function DiagnosesView() {
     }
   };
 
-  const savedResponses = selectedDiag ? getSortedResponses(selectedDiag.id) : [];
+  const savedResponses = detailDiag ? getSortedResponses(detailDiag.id) : [];
+
+  const scrollToAiSection = () => {
+    if (aiSectionRef.current) {
+      aiSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      setFocusAiSection(true);
+    }
+  };
 
   const renderSavedAnswer = (answer) => {
     return answer.split('\n').map((paragraph, idx) => (
@@ -167,6 +210,13 @@ export function DiagnosesView() {
     setCurrentQuestion(note.question || 'Sparat svar');
     setHasSavedResponse(true);
     setActiveHistoryId(note.id);
+  };
+
+  const getSnippet = (text = '') => {
+    if (!text) return '';
+    const sentences = text.split(/(?<=[.!?])\s+/);
+    const snippet = sentences.slice(0, 2).join(' ');
+    return sentences.length > 2 ? `${snippet} …` : snippet;
   };
 
   return (
@@ -187,8 +237,27 @@ export function DiagnosesView() {
           {diagnoses.map(diag => (
             <Card key={diag.id} className="diag-card">
               <div className="diag-header">
-                <h3 className="diag-name">{diag.name}</h3>
-                <span className="diag-date">{formatDate(diag.date)}</span>
+                <div className="diag-header-main">
+                <button className="diag-title" onClick={() => openDetailView(diag)}>
+                  {diag.name}
+                </button>
+                  <span className="diag-date">{formatDate(diag.date)}</span>
+                </div>
+                <div className="diag-actions">
+                  <Button 
+                    variant="ghost" 
+                    size="small"
+                    onClick={() => openDetailView(diag, true)}
+                  >
+                    🤖 AI-analys
+                  </Button>
+                  <Button variant="ghost" size="small" onClick={() => openEditDiagnosis(diag)}>
+                    ✏️ Redigera
+                  </Button>
+                  <Button variant="ghost" size="small" onClick={() => handleDeleteQuick(diag)}>
+                    🗑 Ta bort
+                  </Button>
+                </div>
               </div>
               
               {diag.doctor && (
@@ -196,7 +265,7 @@ export function DiagnosesView() {
               )}
               
               {diag.description && (
-                <p className="diag-description">{diag.description}</p>
+                <p className="diag-description">{getSnippet(diag.description)}</p>
               )}
               
               {diag.treatment && (
@@ -204,22 +273,6 @@ export function DiagnosesView() {
                   <strong>Behandling:</strong> {diag.treatment}
                 </div>
               )}
-              
-              <div className="diag-footer">
-                <Button 
-                  variant="secondary" 
-                  size="small"
-                  onClick={() => openAiModal(diag)}
-                >
-                  🤖 AI-analys
-                </Button>
-                <button 
-                  className="edit-btn"
-                  onClick={() => openEditDiagnosis(diag)}
-                >
-                  ✏️ Redigera
-                </button>
-              </div>
             </Card>
           ))}
         </div>
@@ -295,128 +348,152 @@ export function DiagnosesView() {
         </div>
       </Modal>
 
-      {/* AI Analysis Modal */}
       <Modal
-        isOpen={showAiModal}
-        onClose={() => setShowAiModal(false)}
-        title="AI-analys"
-        icon="🤖"
+        isOpen={showDetailModal && Boolean(detailDiag)}
+        onClose={closeDetailModal}
+        title="Detaljerad diagnos"
+        icon="🔬"
         size="large"
       >
-        {selectedDiag && (
-          <div className="ai-analysis">
-            <div className="ai-diagnosis-header">
-              <h3>{selectedDiag.name}</h3>
-              <Button 
-                variant="outline"
-                size="small"
-                onClick={handleRunNewAnalysis}
-                disabled={isLoading}
-              >
-                {isLoading ? '⏳ Kör analys...' : '🔄 Kör ny analys'}
-              </Button>
-            </div>
-            
-            {isLoading ? (
-              <div className="ai-loading">
-                <div className="spinner" />
-                <p>Analyserar diagnos...</p>
-              </div>
-            ) : aiAnalysis ? (
-              <div className="ai-content">
-                <div className="ai-text">
-                  {renderSavedAnswer(aiAnalysis)}
-                </div>
-                <div className="ai-disclaimer">
-                  ⚠️ Denna information är endast för allmän förståelse och ersätter inte medicinsk rådgivning. Kontakta alltid din läkare vid frågor.
-                </div>
-                <div className="ai-actions">
-                  <Button 
-                    variant="secondary"
-                    onClick={handleSaveCurrentResponse}
-                    disabled={hasSavedResponse}
-                  >
-                    {hasSavedResponse ? '✅ Svar sparat' : '💾 Spara svar'}
-                  </Button>
-                </div>
-              </div>
-            ) : savedResponses.length > 0 ? (
-              <div className="ai-empty">
-                <p>Välj ett sparat svar i listan nedan för att läsa AI-analysen.</p>
-              </div>
-            ) : (
-              <div className="ai-empty">
-                <p>Inga AI-analyser ännu. Klicka på &quot;Kör ny analys&quot; för att komma igång.</p>
-              </div>
+        {detailDiag && (
+          <div className="diag-detail">
+            <p><strong>Datum:</strong> {formatDate(detailDiag.date)}</p>
+            {detailDiag.doctor && <p><strong>Läkare:</strong> {detailDiag.doctor}</p>}
+            {detailDiag.description && (
+              <>
+                <p><strong>Beskrivning:</strong></p>
+                <p>{detailDiag.description}</p>
+              </>
             )}
-
-            <div className="ai-followup">
-              <Textarea
-                label="Ställ en följdfråga"
-                value={followupQuestion}
-                onChange={(e) => setFollowupQuestion(e.target.value)}
-                placeholder="T.ex. Vilka vanliga biverkningar kan jag förvänta mig?"
-                rows={3}
-                disabled={isLoading}
-              />
-              <Button
-                onClick={handleFollowupSubmit}
-                disabled={isLoading || !followupQuestion.trim()}
-              >
-                {isLoading ? '⏳ Analyserar...' : 'Skicka fråga'}
+            {detailDiag.treatment && (
+              <p><strong>Behandling:</strong> {detailDiag.treatment}</p>
+            )}
+            <div className="diag-detail-actions">
+              <Button variant="ghost" onClick={() => { closeDetailModal(); openEditDiagnosis(detailDiag); }}>
+                ✏️ Redigera
+              </Button>
+              <Button variant="secondary" onClick={scrollToAiSection}>
+                🤖 AI-analys
               </Button>
             </div>
 
-            <div className="ai-history">
-              <div className="ai-history-header">
-                <h4>Tidigare sparade svar</h4>
-                <p>AI-svar sparas per diagnos så att du kan gå tillbaka senare.</p>
+            <div className="ai-analysis" ref={aiSectionRef}>
+              <div className="ai-diagnosis-header">
+                <div>
+                  <h3>{detailDiag.name}</h3>
+                  <p>AI-stöd för denna diagnos</p>
+                </div>
+                <Button 
+                  variant="outline"
+                  size="small"
+                  onClick={handleRunNewAnalysis}
+                  disabled={isLoading}
+                >
+                  {isLoading ? '⏳ Kör analys...' : '🔄 Kör ny analys'}
+                </Button>
               </div>
-              {savedResponses.length === 0 ? (
-                <p className="ai-history-empty">Inga sparade svar ännu.</p>
-              ) : (
-                <div className="ai-history-list">
-                  {savedResponses.map(note => (
-                    <div 
-                      key={note.id} 
-                      className={`ai-history-item ${note.id === activeHistoryId ? 'active' : ''}`}
-                      onClick={() => handleSelectSavedResponse(note)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleSelectSavedResponse(note);
-                        }
-                      }}
+              
+              {isLoading ? (
+                <div className="ai-loading">
+                  <div className="spinner" />
+                  <p>Analyserar diagnos...</p>
+                </div>
+              ) : aiAnalysis ? (
+                <div className="ai-content">
+                  <div className="ai-text">
+                    {renderSavedAnswer(aiAnalysis)}
+                  </div>
+                  <div className="ai-disclaimer">
+                    ⚠️ Denna information är endast för allmän förståelse och ersätter inte medicinsk rådgivning. Kontakta alltid din läkare vid frågor.
+                  </div>
+                  <div className="ai-actions">
+                    <Button 
+                      variant="secondary"
+                      onClick={handleSaveCurrentResponse}
+                      disabled={hasSavedResponse}
                     >
-                      <div className="ai-history-meta">
-                        <div className="ai-history-info">
-                          <span className="ai-history-question">{note.question}</span>
-                          <span className="ai-history-date">
-                            {new Date(note.createdAt).toLocaleString('sv-SE', {
-                              dateStyle: 'short',
-                              timeStyle: 'short'
-                            })}
-                          </span>
-                        </div>
-                        <button
-                          className="ai-history-delete"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteSavedResponse(note.id);
-                          }}
-                        >
-                          🗑 Ta bort
-                        </button>
-                      </div>
-                      <div className="ai-history-answer">
-                        {renderSavedAnswer(note.answer)}
-                      </div>
-                    </div>
-                  ))}
+                      {hasSavedResponse ? '✅ Svar sparat' : '💾 Spara svar'}
+                    </Button>
+                  </div>
+                </div>
+              ) : savedResponses.length > 0 ? (
+                <div className="ai-empty">
+                  <p>Välj ett sparat svar i listan nedan för att läsa AI-analysen.</p>
+                </div>
+              ) : (
+                <div className="ai-empty">
+                  <p>Inga AI-analyser ännu. Klicka på &quot;Kör ny analys&quot; för att komma igång.</p>
                 </div>
               )}
+
+              <div className="ai-followup">
+                <Textarea
+                  label="Ställ en följdfråga"
+                  value={followupQuestion}
+                  onChange={(e) => setFollowupQuestion(e.target.value)}
+                  placeholder="T.ex. Vilka vanliga biverkningar kan jag förvänta mig?"
+                  rows={3}
+                  disabled={isLoading}
+                />
+                <Button
+                  onClick={handleFollowupSubmit}
+                  disabled={isLoading || !followupQuestion.trim()}
+                >
+                  {isLoading ? '⏳ Analyserar...' : 'Skicka fråga'}
+                </Button>
+              </div>
+
+              <div className="ai-history">
+                <div className="ai-history-header">
+                  <h4>Tidigare sparade svar</h4>
+                  <p>AI-svar sparas per diagnos så att du kan gå tillbaka senare.</p>
+                </div>
+                {savedResponses.length === 0 ? (
+                  <p className="ai-history-empty">Inga sparade svar ännu.</p>
+                ) : (
+                  <div className="ai-history-list">
+                    {savedResponses.map(note => (
+                      <div 
+                        key={note.id} 
+                        className={`ai-history-item ${note.id === activeHistoryId ? 'active' : ''}`}
+                        onClick={() => handleSelectSavedResponse(note)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleSelectSavedResponse(note);
+                          }
+                        }}
+                      >
+                        <div className="ai-history-meta">
+                          <div className="ai-history-info">
+                            <span className="ai-history-question">{note.question}</span>
+                            <span className="ai-history-date">
+                              {new Date(note.createdAt).toLocaleString('sv-SE', {
+                                dateStyle: 'short',
+                                timeStyle: 'short'
+                              })}
+                            </span>
+                          </div>
+                          <button
+                            className="ai-history-delete"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteSavedResponse(note.id);
+                            }}
+                          >
+                            🗑 Ta bort
+                          </button>
+                        </div>
+                        <div className="ai-history-answer">
+                          {renderSavedAnswer(note.answer)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

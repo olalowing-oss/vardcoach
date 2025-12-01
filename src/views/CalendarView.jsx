@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Card, Button, Modal, Input, Textarea, Select, Checkbox } from '../components/common';
+import { Card, Button, Modal } from '../components/common';
 import { 
   MONTHS_SV, WEEKDAYS_SV, APPOINTMENT_TYPES, APPOINTMENT_COLORS,
   getDaysInMonth, getFirstDayOfMonth, isToday, isSameDay, 
   formatDate, generateId 
 } from '../utils/helpers';
+import { AppointmentFormFields } from '../components/forms/AppointmentFormFields';
 import './CalendarView.css';
 
 export function CalendarView() {
@@ -16,6 +17,9 @@ export function CalendarView() {
   const [showModal, setShowModal] = useState(false);
   const [selectedApt, setSelectedApt] = useState(null);
   const [viewMode, setViewMode] = useState('calendar'); // 'calendar' or 'list'
+  const diagnosisOptions = useMemo(() => (
+    diagnoses.map(diag => ({ value: diag.id, label: diag.name }))
+  ), [diagnoses]);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -263,82 +267,11 @@ export function CalendarView() {
         title={selectedApt ? 'Redigera besök' : 'Nytt besök'}
         icon="📅"
       >
-        <div className="form-grid">
-          <Input
-            label="Titel"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="T.ex. Läkarbesök"
-            required
-          />
-          
-          <Select
-            label="Typ av besök"
-            value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-            options={APPOINTMENT_TYPES}
-          />
-          
-          <Input
-            label="Datum"
-            type="date"
-            value={formData.date}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            required
-          />
-          
-          <Input
-            label="Tid"
-            type="time"
-            value={formData.time}
-            onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-          />
-          
-          <Input
-            label="Plats"
-            value={formData.location}
-            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-            placeholder="T.ex. Vårdcentralen"
-          />
-          
-          <Input
-            label="Läkare"
-            value={formData.doctor}
-            onChange={(e) => setFormData({ ...formData, doctor: e.target.value })}
-            placeholder="T.ex. Dr. Andersson"
-          />
-          
-          {diagnoses.length > 0 && (
-            <Select
-              label="Kopplad diagnos"
-              value={formData.diagnosisId}
-              onChange={(e) => setFormData({ ...formData, diagnosisId: e.target.value })}
-              options={diagnoses.map(d => ({ value: d.id, label: d.name }))}
-              placeholder="Välj diagnos (valfritt)"
-            />
-          )}
-        </div>
-
-        <Textarea
-          label="Syfte med besöket"
-          value={formData.purpose}
-          onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-          placeholder="Vad vill du ta upp?"
-          rows={3}
-        />
-
-        <Textarea
-          label="Förberedelser"
-          value={formData.prepNotes}
-          onChange={(e) => setFormData({ ...formData, prepNotes: e.target.value })}
-          placeholder="Saker att tänka på innan besöket"
-          rows={2}
-        />
-
-        <Checkbox
-          label="Påminn mig dagen innan"
-          checked={formData.reminder}
-          onChange={(e) => setFormData({ ...formData, reminder: e.target.checked })}
+        <AppointmentFormFields
+          formData={formData}
+          setFormData={setFormData}
+          appointmentTypes={APPOINTMENT_TYPES}
+          diagnosisOptions={diagnosisOptions}
         />
 
         <div className="modal-actions">

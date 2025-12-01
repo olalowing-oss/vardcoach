@@ -27,7 +27,7 @@ export function OverallAnalysisView() {
     }
     setError('');
     setAnalysis('');
-    setCurrentQuestion('Övergripande analys');
+    setCurrentQuestion('Helhetsanalys');
     setHasSavedResponse(false);
     setActiveHistoryId(null);
     const result = await analyzeOverallHealth(diagnoses, medications);
@@ -38,7 +38,7 @@ export function OverallAnalysisView() {
     if (!analysis || hasSavedResponse) return;
     const note = {
       id: generateId(),
-      question: currentQuestion || 'Övergripande analys',
+      question: currentQuestion || 'Helhetsanalys',
       answer: analysis,
       createdAt: new Date().toISOString(),
     };
@@ -95,7 +95,7 @@ export function OverallAnalysisView() {
     <div className="overall-analysis">
       <div className="view-header">
         <div>
-          <h1 className="page-title">Övergripande analys</h1>
+          <h1 className="page-title">Helhetsanalys</h1>
           <p className="page-subtitle">Få en samlad AI-bedömning av alla dina diagnoser och läkemedel.</p>
         </div>
         <Button onClick={handleAnalyze} disabled={isLoading || !diagnoses.length}>
@@ -106,7 +106,7 @@ export function OverallAnalysisView() {
       {diagnoses.length === 0 ? (
         <Card className="empty-state">
           <span className="empty-icon">🩺</span>
-          <p>Du behöver lägga till minst en diagnos för att göra en övergripande analys.</p>
+          <p>Du behöver lägga till minst en diagnos för att göra en helhetsanalys.</p>
         </Card>
       ) : (
         <div className="overall-grid">
@@ -163,7 +163,7 @@ export function OverallAnalysisView() {
       {(analysis || error || savedAnalyses.length > 0) && (
         <Card className="analysis-card">
           <div className="card-header">
-            <h3>AI:s övergripande analys</h3>
+            <h3>AI:s helhetsanalys</h3>
           </div>
           {error ? (
             <p className="analysis-error">{error}</p>
@@ -192,7 +192,7 @@ export function OverallAnalysisView() {
             </div>
           ) : (
             <div className="ai-empty">
-              <p>Klicka på &quot;Analysera&quot; för att generera din första övergripande analys.</p>
+              <p>Klicka på &quot;Analysera&quot; för att generera din första helhetsanalys.</p>
             </div>
           )}
 
