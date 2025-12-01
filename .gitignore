@@ -23,6 +23,9 @@
 # Vercel
 .vercel
 
+# Test files (local only)
+test-supabase.js
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
