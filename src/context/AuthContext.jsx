@@ -119,8 +119,14 @@ export function AuthProvider({ children }) {
   const signOut = async () => {
     if (!supabase) return;
 
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    const { error } = await supabase.auth.signOut({ scope: 'local' });
+    if (error && error.message !== 'Auth session missing!') {
+      throw error;
+    }
+
+    setSession(null);
+    setUser(null);
+    setProfile(null);
   };
 
   const resetPassword = async (email) => {

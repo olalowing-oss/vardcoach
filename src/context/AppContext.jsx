@@ -425,14 +425,14 @@ export function AppProvider({ children }) {
             }
 
             let remoteData = data?.data;
+            const shouldSeedFromLocal = !user;
 
             if (!remoteData || Object.keys(remoteData).length === 0) {
-              remoteData = { ...localData };
+              remoteData = shouldSeedFromLocal ? { ...localData } : normalizeDataShape();
               const { error: upsertError } = await supabase
                 .from('health_profiles')
                 .upsert({
                   id: profileId,
-                  user_id: user?.id || null,
                   data: remoteData
                 });
               if (upsertError) {
@@ -558,7 +558,6 @@ export function AppProvider({ children }) {
           .from('health_profiles')
           .upsert({
             id: profileIdRef.current,
-            user_id: user?.id || null,
             data: payload
           });
         if (error) {
