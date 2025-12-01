@@ -177,7 +177,7 @@ export function OverallAnalysisView() {
 
   const handleSelectSaved = (note) => {
     setAnalysis(note.answer);
-    setCurrentQuestion(note.question || 'Sparat svar');
+    setCurrentQuestion(note.title || note.question || 'Sparat svar');
     setHasSavedResponse(true);
     setActiveHistoryId(note.id);
     setError('');
@@ -289,6 +289,7 @@ export function OverallAnalysisView() {
             </div>
           ) : analysis ? (
             <div className="analysis-result">
+              {currentQuestion && <h4 className="analysis-title">{currentQuestion}</h4>}
               {analysis
                 .split('\n')
                 .map((paragraph, idx) => paragraph.trim() && <p key={idx}>{paragraph}</p>)}
@@ -414,12 +415,22 @@ export function OverallAnalysisView() {
                         }
                       }}
                     >
-                      {note.answer
-                        ?.split('\n')
-                        .slice(0, 3)
-                        .map((paragraph, idx) => paragraph.trim() && <p key={idx}>{paragraph}</p>)}
-                      {note.answer?.split('\n').filter(p => p.trim()).length > 3 && (
-                        <p className="ai-history-more">... klicka för att läsa mer</p>
+                      {note.id === activeHistoryId ? (
+                        // Show full text when active
+                        note.answer
+                          ?.split('\n')
+                          .map((paragraph, idx) => paragraph.trim() && <p key={idx}>{paragraph}</p>)
+                      ) : (
+                        // Show preview when not active
+                        <>
+                          {note.answer
+                            ?.split('\n')
+                            .slice(0, 3)
+                            .map((paragraph, idx) => paragraph.trim() && <p key={idx}>{paragraph}</p>)}
+                          {note.answer?.split('\n').filter(p => p.trim()).length > 3 && (
+                            <p className="ai-history-more">... klicka för att läsa mer</p>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
