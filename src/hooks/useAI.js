@@ -90,6 +90,104 @@ Påminn om att informationen inte ersätter medicinsk rådgivning.`;
     return analyzeWithAI(prompt, { maxTokens: 700, temperature: 0.3 });
   }, [analyzeWithAI]);
 
+  const analyzeMedication = useCallback((medication) => {
+    const prompt = `Du hjälper användare i appen Vårdcoachen att förstå sina läkemedel bättre.
+
+Läkemedel: ${medication.name}
+${medication.dosage ? `Dosering: ${medication.dosage}` : ''}
+${medication.frequency ? `Frekvens: ${medication.frequency}` : ''}
+${medication.times?.length ? `Tider: ${medication.times.join(', ')}` : ''}
+${medication.instructions ? `Instruktioner från användaren: ${medication.instructions}` : ''}
+
+Förklara kortfattat:
+1. Vad läkemedlet vanligtvis används till
+2. Vanliga saker att ha koll på eller fråga sin läkare om
+3. Tips på hur användaren kan följa upp effekten
+
+Skriv på svenska, max 220 ord och påminn om att kontakta vården vid frågor.
+Ge inga behandlingsråd, utan bara generell information.`;
+
+    return analyzeWithAI(prompt);
+  }, [analyzeWithAI]);
+
+  const askMedicationFollowUp = useCallback((medication, question) => {
+    const userQuestion = question?.trim();
+    if (!userQuestion) {
+      return Promise.resolve('Ange en fråga för att få ett svar.');
+    }
+
+    const prompt = `Du hjälper användaren i Vårdcoachen med frågor om läkemedlet ${medication.name}.
+
+Dosering: ${medication.dosage || 'Ej angivet'}
+Tider: ${medication.times?.join(', ') || 'Ej angivet'}
+Instruktioner: ${medication.instructions || 'Inga anteckningar'}
+
+Användarens fråga: ${userQuestion}
+
+Svara kort och tydligt på svenska (max 180 ord). Påminn om att kontakta vården vid osäkerhet.`;
+
+    return analyzeWithAI(prompt, { maxTokens: 650, temperature: 0.3 });
+  }, [analyzeWithAI]);
+
+  const analyzeMedicationInteractions = useCallback((medications = []) => {
+    if (!medications.length) {
+      return Promise.resolve('Lägg till minst ett aktivt läkemedel för att kunna analysera.');
+    }
+
+    const medicationSummary = medications
+      .map((med, index) => {
+        const details = [
+          `Läkemedel ${index + 1}: ${med.name}`,
+          med.dosage ? `Dos: ${med.dosage}` : '',
+          med.times?.length ? `Tider: ${med.times.join(', ')}` : '',
+          med.instructions ? `Användarinstruktion: ${med.instructions}` : '',
+          med.frequency ? `Frekvens: ${med.frequency}` : '',
+        ].filter(Boolean);
+        return details.join(' | ');
+      })
+      .join('\n');
+
+    const prompt = `Du är en försiktig informationsassistent i Vårdcoachen.
+    
+Användaren vill förstå hur deras aktiva läkemedel kan påverka varandra och vad som är viktigt att följa upp.
+
+Aktiva läkemedel:
+${medicationSummary}
+
+Analysera kort:
+1. Möjliga interaktioner eller överlapp att fråga läkare/apotek om
+2. Observationer användaren kan följa upp hemma (t.ex. symtom, tider, måltider)
+3. Förslag på frågor till vården
+
+Skriv på svenska (max 260 ord). Ge inga medicinska råd, påminn om att kontakta vården vid osäkerhet.`;
+
+    return analyzeWithAI(prompt, { maxTokens: 850, temperature: 0.3 });
+  }, [analyzeWithAI]);
+
+  const askMedicationInteractionsFollowUp = useCallback((medications = [], question) => {
+    if (!medications.length) {
+      return Promise.resolve('Lägg till minst ett aktivt läkemedel för att kunna analysera.');
+    }
+
+    const userQuestion = question?.trim();
+    if (!userQuestion) {
+      return Promise.resolve('Ange en fråga för att få ett svar.');
+    }
+
+    const medicationSummary = medications
+      .map(med => `${med.name}${med.dosage ? ` (${med.dosage})` : ''}`)
+      .join(', ');
+
+    const prompt = `Du hjälper en användare i Vårdcoachen med frågor om hur deras aktiva läkemedel samspelar.
+
+Aktiva läkemedel: ${medicationSummary}
+Användarens fråga: ${userQuestion}
+
+Svara kort på svenska (max 200 ord) och påminn om att kontakta vården vid osäkerhet.`;
+
+    return analyzeWithAI(prompt, { maxTokens: 700, temperature: 0.3 });
+  }, [analyzeWithAI]);
+
   // Generate questions for doctor
   const generateQuestions = useCallback(async (context) => {
     const { appointment, diagnosis, medications, recentDiary } = context;
@@ -236,6 +334,10 @@ Svara kort på svenska och påminn om att kontakta vården vid frågor.`;
     analyzeWithAI,
     analyzeDiagnosis,
     askDiagnosisFollowUp,
+    analyzeMedication,
+    askMedicationFollowUp,
+    analyzeMedicationInteractions,
+    askMedicationInteractionsFollowUp,
     analyzeOverallHealth,
     askOverallFollowUp,
     generateQuestions,

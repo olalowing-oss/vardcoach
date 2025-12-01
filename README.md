@@ -219,6 +219,10 @@ All data lagras lokalt i webbläsarens localStorage:
 
 > Med Supabase aktiverat kan du nå samma data från flera enheter så länge du använder samma profil-id (hanteras automatiskt av appen).
 
+### 🎯 Demodata för demo
+
+Vill du snabbt demonstrera appen? Logga in, öppna sidan **Profil → Demodata för demo** och klicka på **Importera demodata**. Alla befintliga poster ersätts med ett komplett exempel (diagnoser, läkemedel, dagbok, besök m.m.) så att du kan visa funktionerna direkt på valfritt konto.
+
 ## ⚠️ Viktig information
 
 **Vårdcoachen ersätter INTE medicinsk rådgivning.**

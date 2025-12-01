@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useApp } from '../context/AppContext';
 import { Card, Button, Input } from '../components/common';
 import './ProfileView.css';
 
 export function ProfileView() {
   const { user, profile, updateProfile, signOut } = useAuth();
+  const { actions } = useApp();
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [isImportingDemo, setIsImportingDemo] = useState(false);
 
   useEffect(() => {
     if (profile?.full_name) {
@@ -38,6 +41,20 @@ export function ProfileView() {
       await signOut();
     } catch (err) {
       console.error('Logout error:', err);
+    }
+  };
+
+  const handleImportDemoData = () => {
+    const confirmed = window.confirm(
+      'Detta ersätter din nuvarande data med ett demokonto. Vill du fortsätta?'
+    );
+    if (!confirmed) return;
+
+    setIsImportingDemo(true);
+    try {
+      actions.importDemoData();
+    } finally {
+      setIsImportingDemo(false);
     }
   };
 
@@ -97,6 +114,18 @@ export function ProfileView() {
             </p>
             <Button variant="danger" onClick={handleLogout}>
               🚪 Logga ut
+            </Button>
+          </div>
+        </Card>
+
+        <Card>
+          <h3>Demodata för demo</h3>
+          <div className="profile-actions">
+            <p className="profile-actions-text">
+              Fyll appen med ett komplett exempelkonto för att visa funktionerna. Din befintliga data ersätts.
+            </p>
+            <Button onClick={handleImportDemoData} disabled={isImportingDemo}>
+              {isImportingDemo ? 'Importerar...' : 'Importera demodata'}
             </Button>
           </div>
         </Card>
