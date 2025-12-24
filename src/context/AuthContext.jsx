@@ -131,14 +131,25 @@ export function AuthProvider({ children }) {
 
   const resetPassword = async (email) => {
     if (!supabase) {
-      throw new Error('Supabase inte konfigurerat');
+      throw new Error('Supabase inte konfigurerat. Kontrollera miljövariabler.');
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
 
-    if (error) throw error;
+      if (error) {
+        console.error('Supabase resetPassword error:', error);
+        throw new Error(error.message || 'Kunde inte skicka återställningslänk');
+      }
+    } catch (err) {
+      console.error('Failed to fetch error:', err);
+      if (err.message === 'Failed to fetch') {
+        throw new Error('Kan inte ansluta till Supabase. Kontrollera din internetanslutning och att Supabase är konfigurerat korrekt.');
+      }
+      throw err;
+    }
   };
 
   const updateProfile = async (updates) => {

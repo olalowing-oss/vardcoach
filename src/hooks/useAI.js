@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 
-const DEFAULT_MODEL = process.env.REACT_APP_OPENAI_MODEL || 'gpt-4o-mini';
-const API_URL = process.env.REACT_APP_AI_PROXY_URL || '/api/ai';
+const DEFAULT_MODEL = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o-mini';
+const API_URL = import.meta.env.VITE_AI_PROXY_URL || '/api/ai';
 
 export function useAI() {
   const { state, actions } = useApp();
